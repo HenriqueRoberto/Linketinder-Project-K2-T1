@@ -46,6 +46,9 @@ O front-end do projeto foi desenvolvido utilizando **HTML, CSS e TypeScript**, s
 - **Groovy 4**
 - **Padrão MVC**: Organização em Model, View e Controller.
 - **Spock Framework**: Testes de unidade para validação das regras de negócio.
+- **Html5
+- **Css3
+- **TypeScript
 
 ---
 
