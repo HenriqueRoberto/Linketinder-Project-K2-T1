@@ -2,7 +2,6 @@ package linketinder.model
 
 class PessoaFisica implements Pessoa {
 
-    // Atributos privados
     String nome
     String email
     String cpf
@@ -13,7 +12,6 @@ class PessoaFisica implements Pessoa {
     List<String> competencias
     String senha
 
-    // Construtor (Necessário para o TDD e para os Services)
     PessoaFisica(String nome, String email, String cpf, int idade, String estado, String cep, String descricao, List<String> competencias, String senha) {
         this.nome = nome
         this.email = email
@@ -32,16 +30,14 @@ class PessoaFisica implements Pessoa {
     @Override String getEstado() { return estado }
     @Override String getCep() { return cep }
     @Override String getDescricao() { return descricao }
-    @Override List<String> getCompetencias() { return competencias }
+    List<String> getCompetencias() { return competencias }
 
     // Getters específicos de Pessoa Física
     String getCpf() { return cpf }
     int getIdade() { return idade }
 
-
     @Override
     String toString() {
-        // Verificamos se a lista está nula ou vazia
         String compTexto = (competencias == null || competencias.isEmpty()) ?
                 "sem competências cadastradas" : competencias.join(", ")
 

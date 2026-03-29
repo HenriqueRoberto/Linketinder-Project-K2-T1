@@ -6,5 +6,4 @@ interface Pessoa {
     String getEstado()
     String getCep()
     String getDescricao()
-    List<String> getCompetencias()
 }

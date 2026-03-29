@@ -9,11 +9,9 @@ class PessoaJuridica implements Pessoa {
     String estado
     String cep
     String descricao
-    List<String> competencias
-    String senha // Adicionado para permitir o Login
+    String senha
 
-    // Construtor completo: Essencial para o TDD e os Services
-    PessoaJuridica(String nome, String email, String cnpj, String pais, String estado, String cep, String descricao, List<String> competencias, String senha) {
+    PessoaJuridica(String nome, String email, String cnpj, String pais, String estado, String cep, String descricao, String senha) {
         this.nome = nome
         this.email = email
         this.cnpj = cnpj
@@ -21,7 +19,6 @@ class PessoaJuridica implements Pessoa {
         this.estado = estado
         this.cep = cep
         this.descricao = descricao
-        this.competencias = competencias
         this.senha = senha
     }
 
@@ -31,7 +28,6 @@ class PessoaJuridica implements Pessoa {
     @Override String getEstado() { return estado }
     @Override String getCep() { return cep }
     @Override String getDescricao() { return descricao }
-    @Override List<String> getCompetencias() { return competencias }
 
     // Getters específicos de Pessoa Jurídica
     String getCnpj() { return cnpj }
@@ -39,16 +35,12 @@ class PessoaJuridica implements Pessoa {
 
     @Override
     String toString() {
-        String compTexto = (competencias == null || competencias.isEmpty()) ?
-                "sem competências exigidas" : competencias.join(", ")
-
         return "Nome: " + nome +
                 "\nEmail Corporativo: " + email +
                 "\nCNPJ: " + cnpj +
                 "\nPaís: " + pais +
                 "\nEstado: " + estado +
                 "\nCEP: " + cep +
-                "\nDescrição: " + (descricao ?: "Sem descrição") +
-                "\nCompetências esperadas: " + compTexto
+                "\nDescrição: " + (descricao ?: "Sem descrição")
     }
 }
