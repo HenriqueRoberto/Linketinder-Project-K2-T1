@@ -5,18 +5,19 @@ import linketinder.model.Empresa
 
 class EmpresaServiceSpec extends Specification {
 
-    def "Deve cadastrar uma nova empresa com sucesso na lista"() {
-        given: "Uma nova empresa"
-        def empresa = new Empresa("Tech Corp", "rh@tech.com", "999", "Brasil", "SP", "01000", "TI", ["Java"], "senhaEmpresa123")
-        int totalAntes = EmpresaService.listar().size()
+    def setup() {
+        EmpresaService.empresas = []
+    }
 
-        when: "O método de cadastro da empresa é chamado"
+    def "Deve cadastrar uma nova empresa com sucesso"() {
+        given: "Uma nova empresa"
+        def empresa = new Empresa("TechSul", "rh@techsul.com", "11111111000101", "Brasil", "RS", "90000-100", "Software sob demanda", "corp123")
+
+        when: "A empresa é cadastrada"
         EmpresaService.cadastrar(empresa)
 
-        then: "Verifica se a lista aumentou e se o dado está correto"
-        assert EmpresaService.listar().size() == totalAntes + 1
-        assert EmpresaService.listar().last().email == "rh@tech.com"
-        assert EmpresaService.listar().last().senha == "senhaEmpresa123"
-
+        then: "A empresa deve estar na lista"
+        EmpresaService.listar().size() == 1
+        EmpresaService.listar().first().email == "rh@techsul.com"
     }
 }

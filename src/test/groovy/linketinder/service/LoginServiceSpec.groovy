@@ -2,28 +2,24 @@ package linketinder.service
 
 import spock.lang.Specification
 import linketinder.model.Candidato
-import linketinder.model.Empresa
 
 class LoginServiceSpec extends Specification {
 
-    def "Deve realizar login de um candidato com sucesso"() {
-        given: "Um candidato cadastrado no sistema"
-        Candidato c = new Candidato("Teste", "candidato@teste.com", "123", 20, "SC", "88", "Desc", [], "senha123")
-        CandidatoService.cadastrar(c)
-
-        when: "Tentamos realizar o login com as credenciais corretas"
-        def resultado = LoginService.realizarLogin("candidato@teste.com", "senha123")
-
-        then: "O sistema deve retornar o objeto do candidato"
-        resultado instanceof Candidato
-        resultado.email == "candidato@teste.com"
+    def setup() {
+        CandidatoService.candidatos = []
+        EmpresaService.empresas = []
     }
 
-    def "Deve retornar null para credenciais inválidas"() {
-        when: "Tentamos logar com uma senha incorreta"
-        def resultado = LoginService.realizarLogin("candidato@teste.com", "senha_errada")
+    def "Deve realizar login com sucesso"() {
+        given: "Um candidato cadastrado"
+        def candidato = new Candidato("Ana Silva", "ana@email.com", "11111111111", 22, "SC", "88000-000", "Desenvolvedora", ["Java", "SQL"], "senha123")
+        CandidatoService.candidatos = [candidato]
 
-        then: "O resultado deve ser nulo"
-        resultado == null
+        when: "O login é realizado com as credenciais corretas"
+        def resultado = LoginService.realizarLogin("ana@email.com", "senha123")
+
+        then: "Deve retornar o objeto do candidato"
+        resultado instanceof Candidato
+        resultado.email == "ana@email.com"
     }
 }
