@@ -12,10 +12,10 @@ class PessoaFisica implements Pessoa {
     String estado
     String cep
     String descricao
-    List<String> competencias
+    List<Competencia> competencias
     String senha
 
-    PessoaFisica(String nome, String email, String cpf, int idade, String estado, String cep, String descricao, List<String> competencias, String senha) {
+    PessoaFisica(String nome, String email, String cpf, int idade, String estado, String cep, String descricao, List<Competencia> competencias, String senha) {
         this.id = proximoId++
         this.nome = nome
         this.email = email
@@ -28,22 +28,20 @@ class PessoaFisica implements Pessoa {
         this.senha = senha
     }
 
-    // Implementação explícita da Interface Pessoa
     @Override String getNome() { return nome }
     @Override String getEmail() { return email }
     @Override String getEstado() { return estado }
     @Override String getCep() { return cep }
     @Override String getDescricao() { return descricao }
-    List<String> getCompetencias() { return competencias }
+    List<Competencia> getCompetencias() { return competencias }
 
-    // Getters específicos de Pessoa Física
     String getCpf() { return cpf }
     int getIdade() { return idade }
 
     @Override
     String toString() {
         String compTexto = (competencias == null || competencias.isEmpty()) ?
-                "sem competências cadastradas" : competencias.join(", ")
+                "sem competências cadastradas" : competencias.collect { it.nome }.join(", ")
 
         return "Nome: " + nome +
                 "\nEmail: " + email +
