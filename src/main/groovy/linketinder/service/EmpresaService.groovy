@@ -1,68 +1,87 @@
 package linketinder.service
 
+import linketinder.dao.CompetenciaDAO
+import linketinder.dao.EmpresaDAO
+import linketinder.dao.VagaDAO
+import linketinder.model.Competencia
 import linketinder.model.Empresa
 import linketinder.model.Vaga
-import linketinder.data.DadosMock
 
 class EmpresaService {
-    private static List<Empresa> empresas = DadosMock.empresas()
 
     static void cadastrar(Empresa empresa) {
-        boolean emailExiste = empresas.any { it.email.equalsIgnoreCase(empresa.email) }
+        boolean emailExiste = EmpresaDAO.listar().any { it.email.equalsIgnoreCase(empresa.email) }
 
         if (emailExiste) {
             throw new IllegalArgumentException("Erro: O e-mail " + empresa.email + " já está cadastrado.")
         }
 
-        empresas.add(empresa)
+        int idGerado = EmpresaDAO.inserir(empresa)
+        empresa.id = idGerado
     }
 
     static List<Empresa> listar() {
-        return empresas
+        return EmpresaDAO.listar()
     }
 
     static Empresa buscarPorEmail(String email) {
-        return empresas.find { it.email.equalsIgnoreCase(email) }
+        return EmpresaDAO.buscarPorEmail(email)
     }
 
     static Empresa buscarPorId(int id) {
-        return empresas.find { it.id == id }
+        return EmpresaDAO.buscarPorId(id)
+    }
+
+    static void atualizar(Empresa empresa) {
+        EmpresaDAO.atualizar(empresa)
     }
 
     static List<Vaga> listarTodasVagas() {
-        List<Vaga> todas = []
-        empresas.each { todas.addAll(it.vagas) }
-        return todas
+        return VagaDAO.listarTodas()
     }
 
-    // ---- CRUD de Vagas ----
 
     static void criarVaga(int idEmpresa, Vaga vaga) {
-        Empresa empresa = buscarPorId(idEmpresa)
+        Empresa empresa = EmpresaDAO.buscarPorId(idEmpresa)
         if (empresa == null) throw new IllegalArgumentException("Empresa não encontrada.")
-        empresa.vagas.add(vaga)
+
+        int idVaga = VagaDAO.inserir(vaga)
+        vaga.id = idVaga
+
+        for (Competencia comp : vaga.competencias) {
+            int idComp = CompetenciaDAO.buscarOuInserir(comp.nome)
+            CompetenciaDAO.vincularVaga(idVaga, idComp)
+        }
     }
 
     static List<Vaga> listarVagasDaEmpresa(int idEmpresa) {
-        Empresa empresa = buscarPorId(idEmpresa)
-        if (empresa == null) return []
-        return empresa.vagas
+        return VagaDAO.listarPorEmpresa(idEmpresa)
     }
 
     static void editarVaga(int idEmpresa, int indice, Vaga vagaAtualizada) {
-        Empresa empresa = buscarPorId(idEmpresa)
-        if (empresa == null) throw new IllegalArgumentException("Empresa não encontrada.")
-        if (indice < 0 || indice >= empresa.vagas.size()) throw new IllegalArgumentException("Índice de vaga inválido.")
-        // Preserva o id original da vaga ao editar
-        vagaAtualizada.id = empresa.vagas[indice].id
-        empresa.vagas[indice] = vagaAtualizada
+        List<Vaga> vagas = VagaDAO.listarPorEmpresa(idEmpresa)
+
+        if (indice < 0 || indice >= vagas.size()) {
+            throw new IllegalArgumentException("Índice de vaga inválido.")
+        }
+
+        vagaAtualizada.id = vagas[indice].id
+        VagaDAO.atualizar(vagaAtualizada)
+
+        CompetenciaDAO.desvincularTodasDaVaga(vagaAtualizada.id)
+        for (Competencia comp : vagaAtualizada.competencias) {
+            int idComp = CompetenciaDAO.buscarOuInserir(comp.nome)
+            CompetenciaDAO.vincularVaga(vagaAtualizada.id, idComp)
+        }
     }
 
     static void excluirVaga(int idEmpresa, int indice) {
-        Empresa empresa = buscarPorId(idEmpresa)
-        if (empresa == null) throw new IllegalArgumentException("Empresa não encontrada.")
-        if (indice < 0 || indice >= empresa.vagas.size()) throw new IllegalArgumentException("Índice de vaga inválido.")
-        empresa.vagas.remove(indice)
-        // Qualquer like nessa vaga passa a não encontrar mais a vaga — match some automaticamente
+        List<Vaga> vagas = VagaDAO.listarPorEmpresa(idEmpresa)
+
+        if (indice < 0 || indice >= vagas.size()) {
+            throw new IllegalArgumentException("Índice de vaga inválido.")
+        }
+
+        VagaDAO.deletar(vagas[indice].id)
     }
 }
