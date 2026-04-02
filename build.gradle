@@ -17,6 +17,9 @@ dependencies {
 
     // JUnit Platforma
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Driver PostgreSQL (JDBC)
+    implementation 'org.postgresql:postgresql:42.7.3'
 }
 
 test {
