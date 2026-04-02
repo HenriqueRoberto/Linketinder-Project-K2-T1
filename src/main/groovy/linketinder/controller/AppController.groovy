@@ -5,6 +5,7 @@ import linketinder.model.*
 import linketinder.model.Competencia
 import linketinder.view.MenuView
 import java.util.Scanner
+import linketinder.dao.CompetenciaDAO
 
 class AppController {
 
@@ -56,7 +57,7 @@ class AppController {
             switch (op) {
                 case 1: MenuView.exibirPerfilLogado(usuarioLogado); break
                 case 2: editarDadosCandidato(); break
-                case 3: gerenciarCompetencias(); break
+                case 3: gerenciarCompetencias(usuarioLogado); break
                 case 4: explorarVagas(); break
                 case 5:
                     def matches = MatchService.obterMatchesCandidato(usuarioLogado.id)
@@ -94,22 +95,23 @@ class AppController {
         print "Senha [****]: "
         String senha = scanner.nextLine().trim()
 
-        // Aplica apenas os campos preenchidos, mantendo os atuais nos vazios
-        if (!nome.isEmpty())     usuarioLogado.nome = nome
-        if (!cpf.isEmpty())      usuarioLogado.cpf = cpf
-        if (!idadeStr.isEmpty()) usuarioLogado.idade = idadeStr.toInteger()
-        if (!estado.isEmpty())   usuarioLogado.estado = estado
-        if (!cep.isEmpty())      usuarioLogado.cep = cep
+        if (!nome.isEmpty())      usuarioLogado.nome = nome
+        if (!cpf.isEmpty())       usuarioLogado.cpf = cpf
+        if (!idadeStr.isEmpty())  usuarioLogado.idade = idadeStr.toInteger()
+        if (!estado.isEmpty())    usuarioLogado.estado = estado
+        if (!cep.isEmpty())       usuarioLogado.cep = cep
         if (!descricao.isEmpty()) usuarioLogado.descricao = descricao
-        if (!senha.isEmpty())    usuarioLogado.senha = senha
+        if (!senha.isEmpty())     usuarioLogado.senha = senha
+
+        CandidatoService.atualizar(usuarioLogado)
 
         println "Sucesso: Dados atualizados!"
     }
 
-    // Gerencia competências do candidato logado (CRUD completo: adicionar, editar, excluir, listar)
-    private static void gerenciarCompetencias() {
+
+    private static void gerenciarCompetencias(Candidato candidato) {
         while (true) {
-            List<Competencia> comps = usuarioLogado.competencias
+            List<Competencia> comps = candidato.competencias
 
             MenuView.menuCompetencias()
             int op = scanner.nextInt()
@@ -120,43 +122,41 @@ class AppController {
                     print "Nova competência: "
                     String entrada = scanner.nextLine().trim()
                     if (!entrada.isEmpty()) {
-                        comps.add(new Competencia(entrada))
+                        int idComp = CompetenciaDAO.buscarOuInserir(entrada)
+                        CompetenciaDAO.vincularCandidato(candidato.id, idComp)
+                        Competencia nova = new Competencia(entrada)
+                        nova.id = idComp
+                        comps.add(nova)
                         println "Sucesso: '" + entrada + "' adicionada!"
                     }
                     break
                 case 2:
-                    if (comps.isEmpty()) {
-                        println "Nenhuma competência para editar."
-                        break
-                    }
+                    if (comps.isEmpty()) { println "Nenhuma competência para editar."; break }
                     print "Número da competência para editar: "
-                    int numE = scanner.nextInt()
-                    scanner.nextLine()
+                    int numE = scanner.nextInt(); scanner.nextLine()
                     int indiceE = numE - 1
-                    if (indiceE < 0 || indiceE >= comps.size()) {
-                        println "Erro: Número inválido."
-                        break
-                    }
+                    if (indiceE < 0 || indiceE >= comps.size()) { println "Erro: Número inválido."; break }
                     print "Novo valor [" + comps[indiceE].nome + "]: "
                     String novoValor = scanner.nextLine().trim()
                     if (!novoValor.isEmpty()) {
-                        String antiga = comps[indiceE].nome
+                        // Desvincula a antiga e vincula a nova
+                        CompetenciaDAO.desvincularCandidato(candidato.id, comps[indiceE].id)
+                        int idNovaComp = CompetenciaDAO.buscarOuInserir(novoValor)
+                        CompetenciaDAO.vincularCandidato(candidato.id, idNovaComp)
                         comps[indiceE].nome = novoValor
-                        println "Sucesso: '" + antiga + "' alterada para '" + novoValor + "'!"
+                        comps[indiceE].id = idNovaComp
+                        println "Sucesso: competência atualizada!"
                     }
                     break
                 case 3:
-                    if (comps.isEmpty()) {
-                        println "Nenhuma competência para excluir."
-                        break
-                    }
+                    if (comps.isEmpty()) { println "Nenhuma competência para excluir."; break }
                     print "Número da competência para excluir: "
-                    int numX = scanner.nextInt()
-                    scanner.nextLine()
+                    int numX = scanner.nextInt(); scanner.nextLine()
                     int indiceX = numX - 1
                     if (indiceX < 0 || indiceX >= comps.size()) {
                         println "Erro: Número inválido."
                     } else {
+                        CompetenciaDAO.desvincularCandidato(candidato.id, comps[indiceX].id)
                         String removida = comps.remove(indiceX).nome
                         println "Sucesso: '" + removida + "' removida!"
                     }
@@ -249,13 +249,15 @@ class AppController {
         print "Senha [****]: "
         String senha = scanner.nextLine().trim()
 
-        if (!nome.isEmpty())     usuarioLogado.nome = nome
-        if (!cnpj.isEmpty())     usuarioLogado.cnpj = cnpj
-        if (!pais.isEmpty())     usuarioLogado.pais = pais
-        if (!estado.isEmpty())   usuarioLogado.estado = estado
-        if (!cep.isEmpty())      usuarioLogado.cep = cep
+        if (!nome.isEmpty())      usuarioLogado.nome = nome
+        if (!cnpj.isEmpty())      usuarioLogado.cnpj = cnpj
+        if (!pais.isEmpty())      usuarioLogado.pais = pais
+        if (!estado.isEmpty())    usuarioLogado.estado = estado
+        if (!cep.isEmpty())       usuarioLogado.cep = cep
         if (!descricao.isEmpty()) usuarioLogado.descricao = descricao
-        if (!senha.isEmpty())    usuarioLogado.senha = senha
+        if (!senha.isEmpty())     usuarioLogado.senha = senha
+
+        EmpresaService.atualizar(usuarioLogado)
 
         println "Sucesso: Dados atualizados!"
     }
@@ -276,7 +278,6 @@ class AppController {
         }
     }
 
-    // Fluxo de gerenciamento de vagas da empresa
     private static void fluxoGerenciarVagas() {
         while (true) {
             MenuView.menuGerenciarVagas()
@@ -479,6 +480,9 @@ class AppController {
         try {
             Candidato novo = new Candidato(nome, email, cpf, idade, estado, cep, desc, [], senha)
             CandidatoService.cadastrar(novo)
+
+            gerenciarCompetencias(novo)
+
             println "Sucesso: Cadastrado com sucesso!"
         } catch (IllegalArgumentException e) {
             println "Erro: " + e.getMessage()
