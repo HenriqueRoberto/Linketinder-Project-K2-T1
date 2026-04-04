@@ -187,7 +187,13 @@ psql -U app_user -d linketinder -f database/linketinder.sql
 
 O front-end não funciona ao ser aberto diretamente no navegador — ele depende de um servidor local para carregar os módulos corretamente.
 
+*Opção 1 — VS Code + Live Server (recomendado)*
 1. Abra a pasta do projeto no **VS Code**
 2. Instale a extensão **Live Server** (caso não tenha)
 3. Clique com o botão direito em `front-end/app.html`
 4. Selecione **"Open with Live Server"**
+
+*Opção 2 — Node.js*
+```bash
+npx serve .
+```
