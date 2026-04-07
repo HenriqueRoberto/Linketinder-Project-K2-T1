@@ -9,6 +9,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
+  const setActive = (btnId: string) => {
+    document.querySelectorAll(".menu-nav__link").forEach((el) => {
+      el.classList.remove("active");
+    });
+    document.getElementById(btnId)?.classList.add("active");
+  };
+
   const bind = (btnId: string, target: string, sections: string[]) => {
     const btn = document.getElementById(btnId);
     if (!btn) return;
@@ -17,30 +24,31 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       hideAll(sections);
       document.querySelector(target)?.classList.remove("hidden");
+      setActive(btnId);
     });
   };
 
   if (user.tipo === "candidato") {
-    const sections = [
-      "#profile-candidato",
-      "#match-view-section",
-      ".match-vagas",
-    ];
+    const sections = ["#perfil-candidato", "#matches", ".match-swipe"];
 
-    bind("nav-user", "#profile-candidato", sections);
-    bind("nav-match", "#match-view-section", sections);
-    bind("nav-job", ".match-vagas", sections);
+    bind("nav-candidato-perfil", "#perfil-candidato", sections);
+    bind("nav-candidato-matches", "#matches", sections);
+    bind("nav-candidato-vagas", ".match-swipe", sections);
+
+    setActive("nav-candidato-perfil");
   } else {
     const sections = [
-      ".match-vagas",
-      "#match-view-section",
+      ".match-swipe",
+      "#matches",
       "#vagas-empresa",
-      "#profile-empresa",
+      "#perfil-empresa",
     ];
 
-    bind("nav-job-empresa", ".match-vagas", sections);
-    bind("nav-match-empresa", "#match-view-section", sections);
-    bind("nav-vagas-empresa", "#vagas-empresa", sections);
-    bind("nav-user-empresa", "#profile-empresa", sections);
+    bind("nav-empresa-vagas-match", ".match-swipe", sections);
+    bind("nav-empresa-matches", "#matches", sections);
+    bind("nav-empresa-vagas", "#vagas-empresa", sections);
+    bind("nav-empresa-perfil", "#perfil-empresa", sections);
+
+    setActive("nav-empresa-perfil");
   }
 });

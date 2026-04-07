@@ -7,6 +7,13 @@ document.addEventListener("DOMContentLoaded", () => {
             (_a = document.querySelector(selector)) === null || _a === void 0 ? void 0 : _a.classList.add("hidden");
         });
     };
+    const setActive = (btnId) => {
+        var _a;
+        document.querySelectorAll(".menu-nav__link").forEach((el) => {
+            el.classList.remove("active");
+        });
+        (_a = document.getElementById(btnId)) === null || _a === void 0 ? void 0 : _a.classList.add("active");
+    };
     const bind = (btnId, target, sections) => {
         const btn = document.getElementById(btnId);
         if (!btn)
@@ -16,28 +23,27 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             hideAll(sections);
             (_a = document.querySelector(target)) === null || _a === void 0 ? void 0 : _a.classList.remove("hidden");
+            setActive(btnId);
         });
     };
     if (user.tipo === "candidato") {
-        const sections = [
-            "#profile-candidato",
-            "#match-view-section",
-            ".match-vagas",
-        ];
-        bind("nav-user", "#profile-candidato", sections);
-        bind("nav-match", "#match-view-section", sections);
-        bind("nav-job", ".match-vagas", sections);
+        const sections = ["#perfil-candidato", "#matches", ".match-swipe"];
+        bind("nav-candidato-perfil", "#perfil-candidato", sections);
+        bind("nav-candidato-matches", "#matches", sections);
+        bind("nav-candidato-vagas", ".match-swipe", sections);
+        setActive("nav-candidato-perfil");
     }
     else {
         const sections = [
-            ".match-vagas",
-            "#match-view-section",
+            ".match-swipe",
+            "#matches",
             "#vagas-empresa",
-            "#profile-empresa",
+            "#perfil-empresa",
         ];
-        bind("nav-job-empresa", ".match-vagas", sections);
-        bind("nav-match-empresa", "#match-view-section", sections);
-        bind("nav-vagas-empresa", "#vagas-empresa", sections);
-        bind("nav-user-empresa", "#profile-empresa", sections);
+        bind("nav-empresa-vagas-match", ".match-swipe", sections);
+        bind("nav-empresa-matches", "#matches", sections);
+        bind("nav-empresa-vagas", "#vagas-empresa", sections);
+        bind("nav-empresa-perfil", "#perfil-empresa", sections);
+        setActive("nav-empresa-perfil");
     }
 });

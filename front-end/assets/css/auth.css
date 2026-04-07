@@ -1,3 +1,9 @@
+/* =============================================
+   auth.css — Estilos exclusivos de auth.html
+   Estilos genéricos de form foram movidos para forms.css
+   ============================================= */
+
+/* Layout da página de autenticação */
 body {
   background: linear-gradient(to right, var(--purple) 53%, var(--orange) 47%);
 }
@@ -10,6 +16,21 @@ div.container {
   padding: 5rem 6rem;
 }
 
+main {
+  background-color: white;
+  padding: 2rem;
+  width: 38%;
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0.1rem 0.2rem 2rem -0.6rem #00000099;
+  z-index: 999;
+  overflow-y: auto;
+}
+
+/* Banner lateral */
 section.banner-text {
   height: 60%;
   width: 50%;
@@ -31,42 +52,12 @@ section.banner-text p {
   font-weight: 700;
 }
 
-main {
-  background-color: white;
-  padding: 2rem;
-  width: 38%;
-  min-height: 90vh;
-  display: flex;
-  flex-direction: column; /* Garante alinhamento vertical */
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0.1rem 0.2rem 2rem -0.6rem #00000099;
-  z-index: 999;
-  overflow-y: auto;
-}
-
+/* Seção de formulários */
 section.sec-form {
   width: 100%;
 }
 
-form {
-  gap: 1rem;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  flex-direction: column;
-  padding: 2rem 0;
-}
-
-form .form-group {
-  width: 80%;
-}
-
-form h1 {
-  font-size: 5rem;
-  letter-spacing: 0.2rem;
-}
-
+/* Sobrescritas específicas por tipo de form */
 form.form-login h1 {
   position: relative;
   top: -4rem;
@@ -89,15 +80,6 @@ form.form-candidato h1 span {
   font-size: 4rem;
 }
 
-form label {
-  display: flex;
-  align-self: flex-start;
-  color: rgb(66, 66, 66);
-  font-weight: 700;
-  font-size: 1.8rem;
-  margin-left: 2.5%;
-}
-
 form.form-login label {
   margin-bottom: 1rem;
 }
@@ -107,28 +89,16 @@ form.form-candidato label {
   margin-bottom: 0.5rem;
 }
 
-form input {
-  border-radius: 3.2rem;
-}
-
-form textarea {
-  border-radius: 1rem;
-  resize: none;
-}
-
-form input,
-form textarea {
-  width: 95%;
-}
-
+/* Inputs específicos do login */
 form.form-login input {
   height: 6vh;
-  padding: 0 1.5rem; /* Padding lateral apenas para não cortar o texto */
+  padding: 0 1.5rem;
   border: 0.1rem solid var(--border-grey);
   font-size: 1.6rem;
-  box-sizing: border-box; /* Essencial para o padding não aumentar o width */
+  box-sizing: border-box;
 }
 
+/* Inputs de empresa e candidato */
 form.form-empresa input,
 form.form-empresa textarea,
 form.form-candidato input,
@@ -139,6 +109,7 @@ form.form-candidato textarea {
   box-sizing: border-box;
 }
 
+/* Botões de voltar ao login */
 form button#back-login-empresa,
 form button#back-login-candidato {
   position: absolute;
@@ -152,38 +123,35 @@ form button#back-login-candidato {
   cursor: pointer;
 }
 
-form button {
-  border-radius: 3.2rem;
-  background-color: var(--purple);
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: 1.8rem;
-  font-weight: 700;
-}
-
+/* Botão do form-login */
 form.form-login button {
   width: 80%;
   height: 6vh;
   margin-top: 1rem;
 }
 
+/* Botões de empresa e candidato */
 form.form-empresa button,
 form.form-candidato button {
   width: 60%;
   height: 4vh;
 }
 
+/* Links do login */
 form.form-login .form-links {
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
 }
 
+/* =============================================
+   Responsividade — auth.html
+   ============================================= */
 @media screen and (max-width: 768px) and (min-width: 426px) {
   body {
     background: linear-gradient(to right, var(--purple) 50%, var(--orange) 50%);
   }
+
   div.container {
     justify-content: center;
   }
@@ -195,6 +163,7 @@ form.form-login .form-links {
   section.banner-text {
     display: none;
   }
+
   form button#back-login-empresa,
   form button#back-login-candidato {
     right: 81%;
@@ -205,6 +174,7 @@ form.form-login .form-links {
   body {
     background: linear-gradient(to right, var(--purple) 50%, var(--orange) 50%);
   }
+
   div.container {
     justify-content: center;
     padding: 1rem;

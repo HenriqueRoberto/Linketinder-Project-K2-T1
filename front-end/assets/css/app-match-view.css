@@ -1,133 +1,908 @@
-.match-list {
-  height: 64vh;
-  padding: 1rem;
+/* =============================================
+   BLOCO: matches
+   ============================================= */
+.matches__card {
+  max-width: 50rem;
+  height: 80vh;
+  margin: 2rem auto;
+  border-radius: 1.6rem;
+  overflow: hidden;
+  box-shadow:
+    0 1.2rem 4rem rgba(88, 0, 240, 0.15),
+    0 0.4rem 1.2rem rgba(0, 0, 0, 0.08);
+  background: white;
   display: flex;
-  align-items: center;
   flex-direction: column;
 }
 
-.match-item,
-.vaga-item {
+.matches__header {
+  background: linear-gradient(135deg, #5800f0 0%, #8b35f5 60%, #fb6027 100%);
+  padding: 2rem 2.4rem 1.6rem;
+  flex-shrink: 0;
+}
+
+.matches__titulo {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+}
+
+.matches__lista {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.matches__item {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1.2rem 1rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-bottom: 0.4rem;
+  border: 1px solid transparent;
+}
+
+.matches__item:hover {
+  background: #f7f5ff;
+  border-color: rgba(88, 0, 240, 0.1);
+}
+
+.matches__item-icone {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5800f0, #8b35f5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.matches__item-icone svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.matches__item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.matches__item-titulo {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.matches__dropdown {
+  background: #faf9ff;
+  border: 1px solid #e8e4ff;
+  border-radius: 0.8rem;
+  margin: 0 0.4rem 0.8rem;
+  padding: 0.8rem;
+  max-height: 30vh;
+  overflow-y: auto;
+}
+
+.matches__dropdown ul {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
+  padding: 0.8rem 1rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+  transition: background 0.15s;
   width: 100%;
-  gap: 1rem;
-  padding: 1rem;
-  font-size: 1.6rem;
-  border: 0.1rem solid #00000056;
-  margin-bottom: 0.1rem;
+  list-style: none;
 }
 
-.match-item span {
-  color: var(--purple);
-  font-weight: 700;
+.matches__dropdown ul:hover {
+  background: #ede9ff;
 }
 
+.matches__dropdown li::marker {
+  color: transparent;
+}
+
+.nome-candidato-list {
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #2c2c2a;
+}
+
+.numero-candidato-list {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #fb6027, #ff8c5a);
+  border-radius: 10rem;
+  padding: 0.2rem 0.8rem;
+  list-style: none;
+}
+
+/* seta de expansão */
 .arrow {
   margin-left: auto;
   cursor: pointer;
   font-size: 1.4rem;
-  transition: 0.2s;
+  color: var(--purple);
+  transition: transform 0.2s;
+  flex-shrink: 0;
 }
 
 .arrow.active {
   transform: rotate(180deg);
 }
 
-.drop-empresa-menu-candidato {
-  width: 98%;
-  max-height: 30vh;
-  overflow-y: auto;
-  border-top: none !important;
-  border: 0.1rem solid #00000056;
-  padding: 0 2rem;
-}
-.drop-empresa-menu-candidato ul {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 1rem;
-  width: 100%;
-  border-bottom: 0.1rem solid #00000056;
-}
-
-.drop-empresa-menu-candidato li::marker {
-  color: var(--orange);
-  font-size: 2.2rem;
-}
-.drop-empresa-menu-candidato ul li:nth-child(2)::marker {
-  color: transparent;
-}
-
-.group-dados-vaga {
+/* =============================================
+   BLOCO: modal-vaga — novo design
+   ============================================= */
+.modal-vaga {
+  position: absolute;
+  z-index: 1000;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 38%;
+  max-height: 88vh;
+  border-radius: 1.6rem;
+  overflow: hidden;
+  box-shadow: 0 1.2rem 4rem rgba(88, 0, 240, 0.25);
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  background: white;
 }
 
-.group-dados-vaga input {
-  border: none;
+.modal-vaga__header {
+  background: linear-gradient(135deg, #5800f0 0%, #8b35f5 60%, #fb6027 100%);
+  padding: 2rem 2rem 1.6rem;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
-.group-dados-vaga textarea,
-input {
-  width: 100%;
-  background: transparent;
-  margin-bottom: 0.5rem;
+.modal-vaga__header::before {
+  content: "";
+  position: absolute;
+  top: -3rem;
+  right: -3rem;
+  width: 10rem;
+  height: 10rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  pointer-events: none;
 }
 
-.group-dados-vaga label {
-  text-align: start;
-  color: rgb(39, 39, 39);
+.modal-vaga__titulo {
+  font-size: 1.8rem;
   font-weight: 700;
-  font-size: 1.6rem;
-  margin-bottom: 0.5rem;
+  color: white;
+  position: relative;
+  z-index: 1;
 }
 
-.group-dados-vaga textarea {
-  padding: 1rem;
+.modal-vaga__btn-fechar {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
 }
 
-.group-dados-vaga textarea {
-  height: 30vh;
+.modal-vaga__conteudo {
+  padding: 1.6rem 2rem;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.modal-vaga__secao-titulo {
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--purple);
+  margin-bottom: 0.4rem;
+}
+
+.modal-vaga__secao-titulo--empresa {
+  color: var(--orange);
+}
+
+.modal-vaga__campo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.modal-vaga__campo-grupo label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #888;
+}
+
+.modal-vaga__campo-grupo input,
+.modal-vaga__campo-grupo textarea {
+  background: #f7f5ff;
+  border: none;
+  border-left: 0.3rem solid var(--purple);
+  border-radius: 0 0.6rem 0.6rem 0;
+  padding: 0.7rem 1rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.3rem;
+  color: #2c2c2a;
+  width: 100%;
+  box-sizing: border-box;
   resize: none;
 }
 
-.grafico-competencias {
+.modal-vaga__campo-grupo textarea {
+  min-height: 6rem;
+  max-height: 14rem;
+}
+
+.modal-vaga__row {
+  display: flex;
+  gap: 1rem;
+}
+
+.modal-vaga__row .modal-vaga__campo-grupo {
+  flex: 1;
+}
+
+.modal-vaga__divisor {
+  height: 1px;
+  background: linear-gradient(to right, var(--purple), var(--orange));
+  opacity: 0.12;
+}
+
+.modal-vaga__grafico {
   width: 100%;
+  background: #faf9ff;
+  border: 1px solid #e8e4ff;
+  border-radius: 1rem;
+  padding: 1.2rem;
   overflow-x: auto;
 }
 
-#grafico-competencias {
-  min-width: 30rem;
+#modal-vaga-grafico {
+  min-width: 24rem;
 }
 
-div#view-vaga {
+.modal-vaga__dados-empresa {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* =============================================
+   BLOCO: modal-candidato — novo design
+   ============================================= */
+.modal-candidato {
+  width: 100%;
+  height: 100vh;
+  top: 0;
+  right: 0;
+  position: absolute;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-candidato__card {
+  width: 30;
+  height: 60vh;
+  border-radius: 1.6rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 0 1.2rem 4rem rgba(88, 0, 240, 0.25);
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.modal-candidato__header {
+  background: linear-gradient(135deg, #5800f0 0%, #8b35f5 60%, #fb6027 100%);
+  padding: 2rem 2rem 1.6rem;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.modal-candidato__titulo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+}
+
+.modal-candidato__btn-fechar {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-candidato__conteudo {
+  padding: 1.6rem 2rem;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-candidato__row {
+  display: flex;
+  gap: 1rem;
+}
+
+.modal-candidato__campo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+}
+
+.modal-candidato__campo-grupo label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #888;
+}
+
+.modal-candidato__campo-grupo input,
+.modal-candidato__campo-grupo textarea {
+  background: #f7f5ff;
+  border: none;
+  border-left: 0.3rem solid var(--purple);
+  border-radius: 0 0.6rem 0.6rem 0;
+  padding: 0.7rem 1rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.3rem;
+  color: #2c2c2a;
+  width: 100%;
+  box-sizing: border-box;
+  resize: none;
+}
+
+.modal-candidato__campo-grupo textarea {
+  min-height: 6rem;
+}
+
+.modal-candidato__competencias-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 0.4rem;
+}
+
+/* =============================================
+   BLOCO: vagas-empresa
+   ============================================= */
+
+/* Card principal lista de vagas */
+.vagas-empresa__card {
+  max-width: 50rem;
+  height: 80vh;
+  margin: 2rem auto;
+  border-radius: 1.6rem;
+  overflow: hidden;
+  box-shadow:
+    0 1.2rem 4rem rgba(88, 0, 240, 0.15),
+    0 0.4rem 1.2rem rgba(0, 0, 0, 0.08);
+  background: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.vagas-empresa__header {
+  background: linear-gradient(135deg, #5800f0 0%, #8b35f5 60%, #fb6027 100%);
+  padding: 2rem 2.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.vagas-empresa__titulo {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+}
+
+.vagas-empresa__btn-nova {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 10rem;
+  color: white;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding: 0.6rem 1.4rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.vagas-empresa__btn-nova:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.vagas-empresa__lista {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.vagas-empresa__item {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1.2rem 1rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-bottom: 0.4rem;
+  border: 1px solid transparent;
+}
+
+.vagas-empresa__item:hover {
+  background: #f7f5ff;
+  border-color: rgba(88, 0, 240, 0.1);
+}
+
+.vagas-empresa__item-icone {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fb6027, #ff8c5a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vagas-empresa__item-icone svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.vagas-empresa__item-titulo {
+  flex: 1;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vagas-empresa__item-seta {
+  font-size: 2rem;
+  color: var(--orange);
+  font-weight: 300;
+  flex-shrink: 0;
+}
+
+/* Modal criar/editar vaga */
+.vagas-empresa__modal {
+  position: absolute;
   z-index: 1000;
-  padding: 2rem;
-  top: 10%;
+  top: 3%;
   left: 50%;
   transform: translateX(-50%);
-  border-bottom: 1rem white solid;
+  width: 36%;
+  max-height: 92vh;
+  border-radius: 1.6rem;
+  overflow: hidden;
+  box-shadow: 0 1.2rem 4rem rgba(88, 0, 240, 0.25);
+  display: flex;
+  flex-direction: column;
+  background: white;
 }
 
-h3#titulo-vaga-card {
-  border-bottom: 0.3rem solid var(--purple);
-}
-
-div#empresa-view-dados {
-  top: -8%;
+.vagas-empresa__modal-header {
+  background: linear-gradient(135deg, #5800f0 0%, #8b35f5 60%, #fb6027 100%);
+  padding: 2rem 2rem 1.6rem;
   position: relative;
-  border-top: 0.1rem rgba(0, 0, 0, 0.842) solid;
-  padding-top: 2rem;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
-div#empresa-view-dados input,
-div#empresa-view-dados textarea {
-  font-size: 1.6rem;
+.vagas-empresa__modal-titulo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+  flex: 1;
 }
 
-div#empresa-view-dados label {
-  text-wrap: nowrap;
+.vagas-empresa__modal-fechar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vagas-empresa__modal-body {
+  padding: 1.6rem 2rem;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.vagas-empresa__secao-titulo {
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--purple);
+  margin-bottom: 0.2rem;
+}
+
+.vagas-empresa__divisor {
+  height: 1px;
+  background: linear-gradient(to right, var(--purple), var(--orange));
+  opacity: 0.12;
+}
+
+.vagas-empresa__row {
+  display: flex;
+  gap: 1rem;
+}
+
+.vagas-empresa__row .vagas-empresa__campo-grupo {
+  flex: 1;
+}
+
+.vagas-empresa__campo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.vagas-empresa__campo-grupo label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #888;
+  letter-spacing: 0.05em;
+}
+
+.vagas-empresa__campo-grupo input,
+.vagas-empresa__campo-grupo textarea {
+  background: #f7f5ff;
+  border: none;
+  border-bottom: 2px solid #e0d9ff;
+  border-radius: 0.6rem 0.6rem 0 0;
+  padding: 0.8rem 1rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.4rem;
+  color: #2c2c2a;
+  width: 100%;
+  box-sizing: border-box;
+  resize: none;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.vagas-empresa__campo-grupo input:focus,
+.vagas-empresa__campo-grupo textarea:focus {
+  border-bottom-color: var(--purple);
+}
+
+.vagas-empresa__campo-grupo textarea {
+  min-height: 7rem;
+  max-height: 14rem;
+}
+
+.vagas-empresa__campo-grupo--titulo input {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  border-bottom-color: var(--orange);
+  background: #fff8f5;
+}
+
+.vagas-empresa__campo-grupo--titulo input:focus {
+  border-bottom-color: var(--orange);
+}
+
+.vagas-empresa__competencias-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+}
+
+.vagas-empresa__modal-acoes {
+  padding: 1.2rem 2rem 1.6rem;
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
+  border-top: 1px solid #f0eeff;
+  background: white;
+}
+
+.vagas-empresa__modal-acoes button {
+  flex: 1;
+  padding: 1.1rem;
+  border-radius: 10rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  color: white;
+}
+
+.vagas-empresa__modal-acoes button:nth-child(1) {
+  background: linear-gradient(135deg, #5800f0, #8b35f5);
+  box-shadow: 0 0.4rem 1.2rem rgba(88, 0, 240, 0.3);
+}
+
+.vagas-empresa__modal-acoes button:nth-child(2) {
+  background: #f0eeff;
+  color: var(--purple);
+}
+
+.vagas-empresa__modal-acoes button:nth-child(3) {
+  background: #fff0f0;
+  color: var(--red);
+}
+
+/* =============================================
+   BLOCO: card--for-match — redesign
+   ============================================= */
+.card--for-match {
+  max-width: 40rem;
+  margin: 2rem auto;
+  border-radius: 1.6rem;
+  overflow: hidden;
+  box-shadow:
+    0 1.2rem 4rem rgba(88, 0, 240, 0.18),
+    0 0.4rem 1.2rem rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+/* faixa decorativa topo */
+.card--for-match::before {
+  content: "";
+  display: block;
+  height: 0.6rem;
+  background: linear-gradient(to right, var(--purple), var(--orange));
+  flex-shrink: 0;
+}
+
+/* cabeçalho gradiente */
+.card--for-match__conteudo {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: 58vh;
+}
+
+.card--for-match__conteudo .card__header {
+  padding: 2.4rem 2.4rem 2rem;
+  background: linear-gradient(
+    135deg,
+    var(--purple) 0%,
+    #8b35f5 55%,
+    var(--orange) 100%
+  );
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  margin-bottom: 0;
+}
+
+/* círculos decorativos no header */
+.card--for-match__conteudo .card__header::before {
+  content: "";
+  position: absolute;
+  top: -3rem;
+  right: -3rem;
+  width: 12rem;
+  height: 12rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  pointer-events: none;
+}
+
+.card--for-match__conteudo .card__header::after {
+  content: "";
+  position: absolute;
+  bottom: -2rem;
+  left: -1rem;
+  width: 8rem;
+  height: 8rem;
+  border-radius: 50%;
+  background: rgba(251, 96, 39, 0.2);
+  pointer-events: none;
+}
+
+/* subtítulo "Vaga" / "Candidato" acima do título */
+.match-swipe__tipo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.6rem;
+}
+
+/* título principal */
+.match-swipe__titulo {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+  position: relative;
+  z-index: 1;
+}
+
+/* área dos campos */
+.match-swipe__dados-candidato,
+.match-swipe__dados-vaga {
+  padding: 2rem 2.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.match-swipe__campo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* label estilizado */
+.match-swipe__campo-grupo label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--purple);
+}
+
+/* inputs e textareas dentro do card */
+.match-swipe__campo-grupo input,
+.match-swipe__campo-grupo textarea {
+  width: 100%;
+  background: #f7f5ff;
+  border: none;
+  border-left: 0.3rem solid var(--purple);
+  border-radius: 0 0.8rem 0.8rem 0;
+  padding: 0.8rem 1.2rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.4rem;
+  color: #2c2c2a;
+  resize: none;
+}
+
+.match-swipe__campo-grupo textarea {
+  min-height: 8vh;
+  max-height: 16vh;
+}
+
+/* tags de competências */
+.match-swipe__competencias-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+/* separador entre seções */
+.match-swipe__divisor {
+  height: 0.1rem;
+  background: linear-gradient(to right, var(--purple), var(--orange));
+  opacity: 0.15;
+  margin: 0.2rem 0;
+}
+
+/* área dos botões like/dislike */
+.match-swipe__acoes {
+  padding: 1.6rem 2.4rem 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 4rem;
+  align-items: center;
+  background: #fafafa;
+  border-top: 0.1rem solid rgba(88, 0, 240, 0.07);
+  flex-shrink: 0;
+}
+
+.match-swipe__btn-like,
+.match-swipe__btn-dislike {
+  width: 6.4rem;
+  height: 6.4rem;
+  cursor: pointer;
+  border-radius: 50%;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+  object-fit: contain;
+}
+
+.match-swipe__btn-like {
+  filter: drop-shadow(0 0.4rem 1.2rem rgba(88, 0, 240, 0.4));
+}
+
+.match-swipe__btn-dislike {
+  filter: drop-shadow(0 0.4rem 1.2rem rgba(251, 96, 39, 0.35));
+}
+
+.match-swipe__btn-like:hover,
+.match-swipe__btn-dislike:hover {
+  transform: scale(1.12);
+}
+
+.match-swipe__btn-like:active,
+.match-swipe__btn-dislike:active {
+  transform: scale(0.95);
+}
+
+@media screen and (max-width: 425px) {
+  .vagas-empresa__modal,
+  .modal-vaga,
+  .modal-candidato__card {
+    width: 86%;
+  }
+
+  .card--for-match {
+    margin-top: 10vh;
+  }
+}
+
+@media screen and (max-width: 768px) and (min-width: 426px) {
+  .vagas-empresa__modal,
+  .modal-vaga,
+  .modal-candidato__card {
+    width: 60%;
+  }
 }
