@@ -1,96 +1,280 @@
-.foto-candidato,
-.foto-empresa {
-  width: 100px;
-  height: 100px;
-  background: #ccc;
+/* =============================================
+   BLOCO: perfil (candidato e empresa)
+   ============================================= */
 
-  margin: 0 auto 10px;
+.perfil__card {
+  max-width: 50rem;
+  height: 80vh;
+  margin: 2rem auto;
+  border-radius: 1.6rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow:
+    0 1.2rem 4rem rgba(88, 0, 240, 0.15),
+    0 0.4rem 1.2rem rgba(0, 0, 0, 0.08);
+  background: white;
+  padding-bottom: 2rem;
+}
 
+/* header gradiente */
+.perfil__header {
+  background: linear-gradient(135deg, #5800f0 0%, #8b35f5 60%, #fb6027 100%);
+  padding: 2.4rem 2rem 2.8rem;
+  position: relative;
+  text-align: center;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.perfil__header::before {
+  content: "";
+  position: absolute;
+  top: -4rem;
+  right: -4rem;
+  width: 14rem;
+  height: 14rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+}
+
+.perfil__header::after {
+  content: "";
+  position: absolute;
+  bottom: -3rem;
+  left: -2rem;
+  width: 10rem;
+  height: 10rem;
+  border-radius: 50%;
+  background: rgba(251, 96, 39, 0.15);
+  pointer-events: none;
+}
+
+/* avatar */
+.perfil__avatar,
+.perfil-candidato__avatar,
+.perfil-empresa__avatar {
+  width: 8rem;
+  height: 8rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5800f0, #fb6027);
+  border: 0.35rem solid rgba(255, 255, 255, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
-
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: white;
   cursor: pointer;
+  box-shadow: 0 0.4rem 1.6rem rgba(88, 0, 240, 0.35);
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  background-size: cover;
+  background-position: center;
 }
 
-.foto-candidato {
-  border-radius: 50%;
+.perfil-empresa__avatar {
+  border-radius: 1.2rem;
 }
 
-.foto-empresa {
-  border-radius: 2rem;
-}
-
-.foto-candidato img,
-.foto-empresa img {
+.perfil__avatar img,
+.perfil-candidato__avatar img,
+.perfil-empresa__avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: inherit;
 }
 
-.dados-candidato,
-.dados-empresa {
-  gap: 1rem;
+.perfil__nome {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  position: relative;
+  z-index: 1;
+}
+
+/* corpo */
+.perfil__body {
+  background: white;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.perfil__secao {
+  border-bottom: 1px solid #f0eeff;
+  padding: 1.6rem 0;
+}
+
+.perfil__secao:last-child {
+  border-bottom: none;
+}
+
+.perfil__secao-titulo {
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--purple);
+  margin-bottom: 1.2rem;
+}
+
+/* grid de campos */
+.perfil__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.6rem;
+}
+
+.perfil__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.perfil__campo--full {
+  grid-column: 1 / -1;
+}
+
+.perfil__campo label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #888;
+  letter-spacing: 0.05em;
+}
+
+.perfil__campo input,
+.perfil__campo textarea {
+  background: #f7f5ff;
+  border: none;
+  border-bottom: 2px solid #e0d9ff;
+  border-radius: 0.6rem 0.6rem 0 0;
+  padding: 0.8rem 1rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.4rem;
+  color: #2c2c2a;
+  outline: none;
+  resize: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.perfil__campo input:focus,
+.perfil__campo textarea:focus {
+  border-bottom-color: var(--purple);
+}
+
+.perfil__campo textarea {
+  height: 8rem;
+}
+
+/* campo senha com botão toggle */
+.perfil__senha-wrap {
   display: flex;
   align-items: center;
-  flex-direction: column;
-  padding: 2rem 0;
-  width: 100%;
+  background: #f7f5ff;
+  border-bottom: 2px solid #e0d9ff;
+  border-radius: 0.6rem 0.6rem 0 0;
+  overflow: hidden;
+  transition: border-color 0.2s;
 }
 
-.group-dados-candidato {
-  width: 80%;
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 2rem;
+.perfil__senha-wrap:focus-within {
+  border-bottom-color: var(--purple);
 }
 
-.group-dados-empresa {
-  width: 90%;
-  display: flex;
-  flex-direction: column;
+.perfil__senha-wrap input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0.8rem 1rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.4rem;
+  color: #2c2c2a;
+  outline: none;
+  min-width: 0;
 }
 
-.dados-candidato label,
-.dados-empresa label {
-  display: flex;
-  align-self: flex-start;
-  color: rgb(66, 66, 66);
-  font-weight: 700;
-  font-size: 1.8rem;
-  margin-bottom: 0.5rem;
-  margin-left: 2.5%;
-}
-
-/* inputs iguais form-candidato */
-.dados-candidato input,
-.dados-candidato textarea,
-.dados-empresa input,
-.dados-empresa textarea {
-  width: 95%;
-  padding: 0.5rem 1rem;
-  border: 0.1rem solid var(--border-grey);
+.perfil__senha-toggle {
+  background: #ede9ff;
+  border: none;
+  border-left: 1px solid #e0d9ff;
+  padding: 0 1.2rem;
+  cursor: pointer;
+  color: var(--purple);
   font-size: 1.6rem;
-  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  flex-shrink: 0;
 }
 
-.dados-candidato input {
-  border-radius: 3.2rem;
+/* competências */
+.perfil__btn-add-comp {
+  background: linear-gradient(135deg, #ede9ff, #fff0ea);
+  color: var(--purple);
+  border: 1px solid rgba(88, 0, 240, 0.15);
+  border-radius: 10rem;
+  padding: 0.6rem 1.6rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 1rem;
 }
 
-.dados-empresa input {
-  border-radius: 1rem;
+.perfil-candidato__competencias-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 0.4rem;
 }
 
-.dados-candidato textarea,
-.dados-empresa textarea {
-  border-radius: 1rem;
-  resize: none;
-  height: 10vh;
+/* ações */
+.perfil__secao--acoes {
+  display: flex;
+  gap: 1rem;
+  border-bottom: none;
+  padding-top: 1.6rem;
 }
 
-/* SENHA COM BOTÃO */
+.perfil__btn-salvar {
+  flex: 1;
+  padding: 1.2rem;
+  background: linear-gradient(135deg, #5800f0, #8b35f5);
+  color: white;
+  border: none;
+  border-radius: 10rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0.4rem 1.2rem rgba(88, 0, 240, 0.3);
+}
+
+.perfil__btn-excluir {
+  padding: 1.2rem 1.6rem;
+  background: #fff0f0;
+  color: #e24b4a;
+  border: 1px solid #f09595;
+  border-radius: 10rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* =============================================
+   BLOCO: input-senha (legado — mantido para
+   compatibilidade com outros usos)
+   ============================================= */
 .input-senha {
   width: 95%;
   display: flex;

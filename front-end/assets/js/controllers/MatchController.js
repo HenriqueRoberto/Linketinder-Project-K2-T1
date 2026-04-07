@@ -38,16 +38,18 @@ export class MatchController {
             this.onEmpty();
             return;
         }
-        (_a = document.getElementById("card-for-match")) === null || _a === void 0 ? void 0 : _a.classList.remove("hidden");
+        (_a = document.getElementById("match-swipe-card")) === null || _a === void 0 ? void 0 : _a.classList.remove("hidden");
         this.showCurrent();
-        (_b = document.getElementById("like-btn")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => {
+        (_b = document
+            .getElementById("match-swipe-btn-like")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => {
             const current = this.items[this.index];
             if (!current)
                 return;
             this.onLike(current);
             this.next();
         });
-        (_c = document.getElementById("dislike-btn")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", () => {
+        (_c = document
+            .getElementById("match-swipe-btn-dislike")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", () => {
             const current = this.items[this.index];
             if (!current)
                 return;

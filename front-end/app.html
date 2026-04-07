@@ -14,23 +14,24 @@
   <body>
     <div class="container">
       <main>
-        <img id="log-out" src="./assets/img/log-out.png" alt="" />
-        <!-- tela logada com candidato -->
-        <section class="menu-nav hidden" id="menu-nav-candidato">
+        <img id="btn-logout" src="./assets/img/log-out.png" alt="" />
+
+        <!-- ========== MENU CANDIDATO ========== -->
+        <section class="menu-nav hidden" id="menu-candidato">
           <nav>
-            <ul class="nav-links">
-              <li>
-                <a href="#" id="nav-job">
+            <ul class="menu-nav__lista">
+              <li class="menu-nav__item">
+                <a href="#" class="menu-nav__link" id="nav-candidato-vagas">
                   <img src="assets/img/job.png" alt="" />
                 </a>
               </li>
-              <li>
-                <a href="#" id="nav-match">
+              <li class="menu-nav__item">
+                <a href="#" class="menu-nav__link" id="nav-candidato-matches">
                   <img src="assets/img/match.png" alt="" />
                 </a>
               </li>
-              <li>
-                <a href="#" id="nav-user">
+              <li class="menu-nav__item">
+                <a href="#" class="menu-nav__link" id="nav-candidato-perfil">
                   <img src="assets/img/user.png" alt="" />
                 </a>
               </li>
@@ -38,333 +39,453 @@
           </nav>
         </section>
 
-        <section class="profile-candidato hidden" id="profile-candidato">
-          <div class="card">
-            <div class="header-card">
-              <div class="foto-candidato" id="foto-candidato"></div>
-
+        <!-- ========== PERFIL CANDIDATO ========== -->
+        <section class="perfil-candidato hidden" id="perfil-candidato">
+          <div class="perfil__card">
+            <!-- header -->
+            <div class="perfil__header">
+              <div class="perfil__avatar" id="perfil-candidato-avatar"></div>
               <input
                 type="file"
-                id="input-foto"
+                id="perfil-candidato-avatar-input"
                 accept="image/*"
                 class="hidden"
               />
-
-              <h2 id="nome-perfil-candidato">Nome do Candidato</h2>
-              <span class="bar-orange-35"></span>
+              <h2 class="perfil__nome" id="perfil-candidato-nome">
+                Nome do Candidato
+              </h2>
             </div>
 
-            <div class="dados-candidato">
-              <div class="group-dados-candidato">
-                <label for="nome-candidato">Nome</label>
-                <input
-                  type="text"
-                  id="nome-candidato"
-                  placeholder="Digite o nome do candidato"
-                  pattern="^[A-Za-zÀ-ÿ\s]+$"
-                  title="Digite apenas letras e espaços"
-                  required
-                />
-              </div>
-
-              <div class="group-dados-candidato">
-                <label for="email-candidato">Email</label>
-                <input
-                  type="email"
-                  id="email-candidato"
-                  placeholder="Digite o email do candidato"
-                  pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"
-                  title="Email inválido. Ex: nome@email.com"
-                  required
-                />
-              </div>
-
-              <div class="group-dados-candidato">
-                <label for="cpf-candidato">CPF</label>
-                <input
-                  type="text"
-                  id="cpf-candidato"
-                  placeholder="Digite o CPF do candidato"
-                  pattern="^\d{3}\.\d{3}\.\d{3}-\d{2}$"
-                  title="Formato: 000.000.000-00"
-                  required
-                />
-              </div>
-
-              <div class="group-dados-candidato">
-                <label for="idade-candidato">Idade</label>
-                <input
-                  type="number"
-                  id="idade-candidato"
-                  placeholder="Digite a idade do candidato"
-                  min="0"
-                  max="120"
-                  title="Digite uma idade válida (0 a 120)"
-                  required
-                />
-              </div>
-
-              <div class="group-dados-candidato">
-                <label for="estado-candidato">Estado</label>
-                <input
-                  type="text"
-                  id="estado-candidato"
-                  placeholder="Digite o estado"
-                  pattern="^[A-Za-zÀ-ÿ]+(?:[ -][A-Za-zÀ-ÿ]+)*$"
-                  title="Digite o nome do estado"
-                  required
-                />
-              </div>
-
-              <div class="group-dados-candidato">
-                <label for="cep-candidato">CEP</label>
-                <input
-                  type="text"
-                  id="cep-candidato"
-                  placeholder="Digite o CEP"
-                  pattern="^\d{5}-\d{3}$"
-                  title="Formato: 00000-000"
-                  required
-                />
-              </div>
-
-              <div class="group-dados-candidato">
-                <label for="descricao-candidato">Descrição</label>
-                <textarea id="descricao-candidato"></textarea>
-              </div>
-
-              <div class="group-dados-candidato">
-                <label for="senha-atual">Senha atual</label>
-                <div class="input-senha">
-                  <input type="password" id="senha-atual" />
-                  <button type="button" id="toggle-senha-atual">👁</button>
+            <!-- corpo -->
+            <div class="perfil__body">
+              <div class="perfil__secao">
+                <div class="perfil__secao-titulo">Dados pessoais</div>
+                <div class="perfil__grid">
+                  <div class="perfil__campo">
+                    <label for="perfil-candidato-campo-nome">Nome</label>
+                    <input
+                      type="text"
+                      id="perfil-candidato-campo-nome"
+                      placeholder="Nome completo"
+                      pattern="^[A-Za-zÀ-ÿ\s]+$"
+                      title="Digite apenas letras e espaços"
+                      required
+                    />
+                  </div>
+                  <div class="perfil__campo">
+                    <label for="perfil-candidato-campo-email">Email</label>
+                    <input
+                      type="email"
+                      id="perfil-candidato-campo-email"
+                      placeholder="email@exemplo.com"
+                      pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"
+                      title="Email inválido."
+                      required
+                    />
+                  </div>
+                  <div class="perfil__campo">
+                    <label for="perfil-candidato-campo-cpf">CPF</label>
+                    <input
+                      type="text"
+                      id="perfil-candidato-campo-cpf"
+                      placeholder="000.000.000-00"
+                      pattern="^\d{3}\.\d{3}\.\d{3}-\d{2}$"
+                      title="Formato: 000.000.000-00"
+                      required
+                    />
+                  </div>
+                  <div class="perfil__campo">
+                    <label for="perfil-candidato-campo-idade">Idade</label>
+                    <input
+                      type="number"
+                      id="perfil-candidato-campo-idade"
+                      placeholder="0"
+                      min="0"
+                      max="120"
+                      required
+                    />
+                  </div>
+                  <div class="perfil__campo">
+                    <label for="perfil-candidato-campo-estado">Estado</label>
+                    <input
+                      type="text"
+                      id="perfil-candidato-campo-estado"
+                      placeholder="Estado"
+                      pattern="^[A-Za-zÀ-ÿ]+(?:[ -][A-Za-zÀ-ÿ]+)*$"
+                      required
+                    />
+                  </div>
+                  <div class="perfil__campo">
+                    <label for="perfil-candidato-campo-cep">CEP</label>
+                    <input
+                      type="text"
+                      id="perfil-candidato-campo-cep"
+                      placeholder="00000-000"
+                      pattern="^\d{5}-\d{3}$"
+                    />
+                  </div>
+                  <div class="perfil__campo perfil__campo--full">
+                    <label for="perfil-candidato-campo-descricao"
+                      >Descrição</label
+                    >
+                    <textarea
+                      id="perfil-candidato-campo-descricao"
+                      placeholder="Fale um pouco sobre você"
+                    ></textarea>
+                  </div>
                 </div>
               </div>
 
-              <div class="group-dados-candidato">
-                <label for="nova-senha">Nova senha</label>
-                <div class="input-senha">
-                  <input type="password" id="nova-senha" />
-                  <button
-                    type="button"
-                    id="toggle-nova-senha"
-                    pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{6,}"
-                    title="Mínimo 6 caracteres, com maiúscula, minúscula, número e símbolo"
-                  >
-                    👁
-                  </button>
+              <div class="perfil__secao">
+                <div class="perfil__secao-titulo">Competências</div>
+                <button
+                  class="perfil__btn-add-comp"
+                  id="perfil-candidato-btn-add-competencia"
+                >
+                  + Adicionar competência
+                </button>
+                <div
+                  class="perfil-candidato__competencias-lista"
+                  id="perfil-candidato-competencias-lista"
+                ></div>
+                <div
+                  class="competencia hidden"
+                  id="perfil-candidato-competencia-template"
+                >
+                  <span class="competencia__texto">Categoria</span>
                 </div>
               </div>
-            </div>
 
-            <div class="competencias">
-              <button class="btn" id="btn-add-competencia">
-                Adicionar competência
-              </button>
+              <div class="perfil__secao">
+                <div class="perfil__secao-titulo">Segurança</div>
+                <div class="perfil__grid">
+                  <div class="perfil__campo">
+                    <label for="perfil-candidato-campo-senha-atual"
+                      >Senha atual</label
+                    >
+                    <div class="perfil__senha-wrap">
+                      <input
+                        type="password"
+                        id="perfil-candidato-campo-senha-atual"
+                        placeholder="••••••"
+                      />
+                      <button
+                        type="button"
+                        id="perfil-candidato-toggle-senha-atual"
+                        class="perfil__senha-toggle"
+                      >
+                        👁
+                      </button>
+                    </div>
+                  </div>
+                  <div class="perfil__campo">
+                    <label for="perfil-candidato-campo-nova-senha"
+                      >Nova senha</label
+                    >
+                    <div class="perfil__senha-wrap">
+                      <input
+                        type="password"
+                        id="perfil-candidato-campo-nova-senha"
+                        placeholder="mínimo 6 caracteres"
+                        pattern=".{6,}"
+                        title="Mínimo 6 caracteres"
+                      />
+                      <button
+                        type="button"
+                        id="perfil-candidato-toggle-nova-senha"
+                        class="perfil__senha-toggle"
+                      >
+                        👁
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-              <div class="lista-competencias" id="lista-competencias"></div>
-
-              <!-- template invisível -->
-              <div
-                class="competencia-template hidden"
-                id="competencia-template"
-              >
-                <span class="competencia-texto">Categoria</span>
+              <div class="perfil__secao perfil__secao--acoes">
+                <button
+                  class="perfil__btn-salvar"
+                  id="perfil-candidato-btn-salvar"
+                >
+                  Salvar
+                </button>
+                <button
+                  class="perfil__btn-excluir"
+                  id="perfil-candidato-btn-excluir"
+                >
+                  Excluir conta
+                </button>
               </div>
             </div>
-            <button class="btn" id="btn-salvar-candidato">Salvar</button>
-            <button id="btn-excluir-conta-candidato">Excluir conta</button>
           </div>
 
-          <div id="popup-competencia" class="popup hidden">
-            <div class="popup-content">
+          <div id="perfil-candidato-popup-competencia" class="popup hidden">
+            <div class="popup__content">
               <h3>Adicionar competência</h3>
-
               <input
                 type="text"
-                id="input-competencia"
+                id="perfil-candidato-popup-input"
                 placeholder="Digite a competência"
               />
-
-              <div class="popup-actions">
-                <button id="cancelar-competencia">Cancelar</button>
-                <button id="confirmar-competencia">Adicionar</button>
+              <div class="popup__actions">
+                <button id="perfil-candidato-popup-cancelar">Cancelar</button>
+                <button id="perfil-candidato-popup-confirmar">Adicionar</button>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- compartilhado -->
-
-        <section class="match-view" id="match-view-section">
-          <div class="card">
-            <div class="header-card">
-              <h2>Matches</h2>
-              <span class="bar-orange-30"></span>
+        <!-- ========== MATCHES ========== -->
+        <section class="matches hidden" id="matches">
+          <div class="matches__card">
+            <div class="matches__header">
+              <h2 class="matches__titulo">Matches</h2>
             </div>
-            <div class="match-list" id="match-list">
-              <!-- Matches serão adicionados aqui dinamicamente -->
-              <div class="match-item hidden">
-                <span>|</span>
-                <h3 class="titulo-vaga" id="titulo-vaga"></h3>
+
+            <div class="matches__lista" id="matches-lista">
+              <!-- template de item -->
+              <div class="matches__item hidden">
+                <div class="matches__item-icone">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"
+                      fill="white"
+                    />
+                    <path
+                      d="M16 3H8L6 7h12l-2-4z"
+                      fill="rgba(255,255,255,0.6)"
+                    />
+                  </svg>
+                </div>
+                <div class="matches__item-info">
+                  <h3 class="matches__item-titulo"></h3>
+                </div>
                 <span class="arrow">▼</span>
               </div>
 
-              <div
-                class="drop-empresa-menu-candidato hidden"
-                id="drop-empresa-menu-candidato"
-              >
-                <div id="candidato-list"></div>
+              <div class="matches__dropdown hidden" id="matches-dropdown">
+                <div id="matches-dropdown-lista"></div>
               </div>
             </div>
 
-            <div class="card-view hidden" id="view-vaga">
-              <div class="header-card-view">
-                <h3 class="titulo-card" id="titulo-vaga-card"></h3>
-
-                <button class="btn-fechar-card" id="btn-fechar-card">X</button>
+            <!-- Modal lateral: detalhes da vaga -->
+            <div class="modal-vaga hidden" id="modal-vaga">
+              <div class="modal-vaga__header">
+                <h3 class="modal-vaga__titulo" id="modal-vaga-titulo"></h3>
+                <button
+                  class="modal-vaga__btn-fechar"
+                  id="modal-vaga-btn-fechar"
+                >
+                  ✕
+                </button>
               </div>
-              <div class="card-content-view" id="card-content-view">
-                <div class="group-dados-vaga">
-                  <label for="descricao-vaga">Descrição vaga</label>
-                  <textarea id="descricao-vaga" disabled></textarea>
-                </div>
-                <div class="group-dados-vaga row">
-                  <label for="horario-vaga">Horário:</label>
-                  <input type="text" id="horario-vaga" disabled />
-                </div>
-                <div class="group-dados-vaga row">
-                  <label for="localizacao-vaga">Localização:</label>
-                  <input type="text" id="localizacao-vaga" disabled />
-                </div>
-                <div class="group-dados-vaga row">
-                  <label for="salario-vaga">Remuneração:</label>
-                  <input type="text" id="salario-vaga" disabled />
+
+              <div class="modal-vaga__conteudo" id="modal-vaga-conteudo">
+                <div class="modal-vaga__secao-titulo">Descrição</div>
+                <div class="modal-vaga__campo-grupo">
+                  <textarea id="modal-vaga-campo-descricao" disabled></textarea>
                 </div>
 
-                <div class="group-dados-vaga">
-                  <label for="requisitos-vaga">Requisitos:</label>
-                  <textarea id="requisitos-vaga" disabled></textarea>
-                </div>
+                <div class="modal-vaga__divisor"></div>
 
-                <div class="group-dados-vaga">
-                  <label for="competencias-vaga">Competencias:</label>
-                  <textarea id="competencias-vaga" disabled></textarea>
-                </div>
-                <!-- gráfico de competências -->
-                <div class="grafico-competencias">
-                  <canvas id="grafico-competencias"></canvas>
-                </div>
-
-                <!-- dados empresa -->
-                <div class="empresa-view-dados hidden" id="empresa-view-dados">
-                  <div class="group-dados-vaga row">
-                    <label for="nome-empresa-match">Nome da empresa:</label>
-                    <input type="text" id="nome-empresa-match" disabled />
+                <div class="modal-vaga__row">
+                  <div class="modal-vaga__campo-grupo">
+                    <label for="modal-vaga-campo-horario">Horário</label>
+                    <input type="text" id="modal-vaga-campo-horario" disabled />
                   </div>
-
-                  <div class="group-dados-vaga row">
-                    <label for="email-empresa-match">Email:</label>
-                    <input type="text" id="email-empresa-match" disabled />
-                  </div>
-
-                  <div class="group-dados-vaga row">
-                    <label for="cnpj-empresa-match">CNPJ:</label>
-                    <input type="text" id="cnpj-empresa-match" disabled />
-                  </div>
-
-                  <div class="group-dados-vaga">
-                    <label for="descricao-empresa-match"
-                      >Descrição da empresa:</label
+                  <div class="modal-vaga__campo-grupo">
+                    <label for="modal-vaga-campo-localizacao"
+                      >Localização</label
                     >
-                    <textarea id="descricao-empresa-match" disabled></textarea>
+                    <input
+                      type="text"
+                      id="modal-vaga-campo-localizacao"
+                      disabled
+                    />
                   </div>
-
-                  <div class="group-dados-vaga row">
-                    <label for="pais-empresa-match">País:</label>
-                    <input type="text" id="pais-empresa-match" disabled />
-                  </div>
-
-                  <div class="group-dados-vaga row">
-                    <label for="estado-empresa-match">Estado:</label>
-                    <input type="text" id="estado-empresa-match" disabled />
-                  </div>
-
-                  <div class="group-dados-vaga row">
-                    <label for="cep-empresa-match">CEP:</label>
-                    <input type="text" id="cep-empresa-match" disabled />
-                  </div>
-                  <!--  -->
+                </div>
+                <div class="modal-vaga__campo-grupo">
+                  <label for="modal-vaga-campo-salario">Remuneração</label>
+                  <input type="text" id="modal-vaga-campo-salario" disabled />
                 </div>
 
-                <!--  -->
-              </div>
-            </div>
+                <div class="modal-vaga__divisor"></div>
 
-            <div class="candidato-view-dados hidden" id="candidato-view-dados">
-              <div class="card" id="card-candidato-view-match">
-                <div class="header-card-view">
-                  <h3 class="titulo-card" id="nome-candidato-view"></h3>
-                  <button
-                    class="btn-fechar-card"
-                    id="btn-fechar-card-candidato"
+                <div class="modal-vaga__secao-titulo">Requisitos</div>
+                <div class="modal-vaga__campo-grupo">
+                  <textarea
+                    id="modal-vaga-campo-requisitos"
+                    disabled
+                  ></textarea>
+                </div>
+
+                <div class="modal-vaga__divisor"></div>
+
+                <div class="modal-vaga__secao-titulo">Competências</div>
+                <div class="modal-vaga__campo-grupo">
+                  <textarea
+                    id="modal-vaga-campo-competencias"
+                    disabled
+                  ></textarea>
+                </div>
+
+                <div class="modal-vaga__grafico">
+                  <canvas id="modal-vaga-grafico"></canvas>
+                </div>
+
+                <!-- dados da empresa (visível para candidato) -->
+                <div
+                  class="modal-vaga__dados-empresa hidden"
+                  id="modal-vaga-dados-empresa"
+                >
+                  <div class="modal-vaga__divisor"></div>
+                  <div
+                    class="modal-vaga__secao-titulo modal-vaga__secao-titulo--empresa"
                   >
-                    X
-                  </button>
-                </div>
-
-                <div class="card-content-view" id="card-content-view">
-                  <div class="dados-candidato">
-                    <div class="group-dados-candidato">
-                      <label for="email-candidato-view">Email</label>
+                    Empresa
+                  </div>
+                  <div class="modal-vaga__row">
+                    <div class="modal-vaga__campo-grupo">
+                      <label for="modal-vaga-empresa-nome">Nome</label>
                       <input
-                        type="email"
-                        id="email-candidato-view  "
+                        type="text"
+                        id="modal-vaga-empresa-nome"
                         disabled
                       />
                     </div>
-
-                    <div class="group-dados-candidato">
-                      <label for="cpf-candidato-view">CPF</label>
-                      <input type="text" id="cpf-candidato-view" disabled />
-                    </div>
-
-                    <div class="group-dados-candidato">
-                      <label for="idade-candidato-view">Idade</label>
-                      <input type="number" id="idade-candidato-view" disabled />
-                    </div>
-
-                    <div class="group-dados-candidato">
-                      <label for="estado-candidato-view">Estado</label>
-                      <input type="text" id="estado-candidato-view" disabled />
-                    </div>
-
-                    <div class="group-dados-candidato">
-                      <label for="cep-candidato-view    ">CEP</label>
-                      <input type="text" id="cep-candidato-view" disabled />
-                    </div>
-
-                    <div class="group-dados-candidato">
-                      <label for="descricao-candidato-view">Descrição</label>
-                      <textarea
-                        id="descricao-candidato-view"
+                    <div class="modal-vaga__campo-grupo">
+                      <label for="modal-vaga-empresa-email">Email</label>
+                      <input
+                        type="text"
+                        id="modal-vaga-empresa-email"
                         disabled
-                      ></textarea>
+                      />
                     </div>
+                  </div>
+                  <div class="modal-vaga__row">
+                    <div class="modal-vaga__campo-grupo">
+                      <label for="modal-vaga-empresa-cnpj">CNPJ</label>
+                      <input
+                        type="text"
+                        id="modal-vaga-empresa-cnpj"
+                        disabled
+                      />
+                    </div>
+                    <div class="modal-vaga__campo-grupo">
+                      <label for="modal-vaga-empresa-pais">País</label>
+                      <input
+                        type="text"
+                        id="modal-vaga-empresa-pais"
+                        disabled
+                      />
+                    </div>
+                  </div>
+                  <div class="modal-vaga__row">
+                    <div class="modal-vaga__campo-grupo">
+                      <label for="modal-vaga-empresa-estado">Estado</label>
+                      <input
+                        type="text"
+                        id="modal-vaga-empresa-estado"
+                        disabled
+                      />
+                    </div>
+                    <div class="modal-vaga__campo-grupo">
+                      <label for="modal-vaga-empresa-cep">CEP</label>
+                      <input type="text" id="modal-vaga-empresa-cep" disabled />
+                    </div>
+                  </div>
+                  <div class="modal-vaga__campo-grupo">
+                    <label for="modal-vaga-empresa-descricao">Descrição</label>
+                    <textarea
+                      id="modal-vaga-empresa-descricao"
+                      disabled
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                    <div
-                      class="lista-competencias"
-                      id="lista-competencias"
-                    ></div>
-
-                    <!-- template invisível -->
-                    <div
-                      class="competencia-template hidden"
-                      id="competencia-template"
+            <!-- Modal: detalhes do candidato (visível para empresa) -->
+            <div class="modal-candidato hidden" id="modal-candidato">
+              <div class="modal-candidato__card" id="modal-candidato-card">
+                <div class="modal-candidato__header">
+                  <h3
+                    class="modal-candidato__titulo"
+                    id="modal-candidato-titulo"
+                  ></h3>
+                  <button
+                    class="modal-candidato__btn-fechar"
+                    id="modal-candidato-btn-fechar"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div class="modal-candidato__conteudo">
+                  <div class="modal-candidato__row">
+                    <div class="modal-candidato__campo-grupo">
+                      <label for="modal-candidato-campo-email">Email</label>
+                      <input
+                        type="email"
+                        id="modal-candidato-campo-email"
+                        disabled
+                      />
+                    </div>
+                    <div class="modal-candidato__campo-grupo">
+                      <label for="modal-candidato-campo-cpf">CPF</label>
+                      <input
+                        type="text"
+                        id="modal-candidato-campo-cpf"
+                        disabled
+                      />
+                    </div>
+                  </div>
+                  <div class="modal-candidato__row">
+                    <div class="modal-candidato__campo-grupo">
+                      <label for="modal-candidato-campo-idade">Idade</label>
+                      <input
+                        type="number"
+                        id="modal-candidato-campo-idade"
+                        disabled
+                      />
+                    </div>
+                    <div class="modal-candidato__campo-grupo">
+                      <label for="modal-candidato-campo-estado">Estado</label>
+                      <input
+                        type="text"
+                        id="modal-candidato-campo-estado"
+                        disabled
+                      />
+                    </div>
+                  </div>
+                  <div class="modal-candidato__campo-grupo">
+                    <label for="modal-candidato-campo-cep">CEP</label>
+                    <input
+                      type="text"
+                      id="modal-candidato-campo-cep"
+                      disabled
+                    />
+                  </div>
+                  <div class="modal-candidato__campo-grupo">
+                    <label for="modal-candidato-campo-descricao"
+                      >Descrição</label
                     >
-                      <span class="competencia-texto">Categoria</span>
-                    </div>
-                    <!--  -->
+                    <textarea
+                      id="modal-candidato-campo-descricao"
+                      disabled
+                    ></textarea>
+                  </div>
+                  <div class="modal-candidato__campo-grupo">
+                    <label>Competências</label>
+                    <div
+                      class="modal-candidato__competencias-lista"
+                      id="modal-candidato-competencias-lista"
+                    ></div>
+                  </div>
+                  <div
+                    class="competencia hidden"
+                    id="modal-candidato-competencia-template"
+                  >
+                    <span class="competencia__texto">Competência</span>
                   </div>
                 </div>
               </div>
@@ -372,121 +493,139 @@
           </div>
         </section>
 
-        <section class="match-vagas hidden">
-          <div class="card hidden" id="card-sem-vagas">
-            <div class="card-vazio">
+        <!-- ========== MATCH SWIPE ========== -->
+        <section class="match-swipe hidden">
+          <div class="card hidden" id="match-swipe-sem-vagas">
+            <div class="card__vazio">
               <h2>Não há vagas disponíveis</h2>
               <p>:/</p>
             </div>
           </div>
-          <div class="card hidden" id="card-sem-candidatos">
-            <div class="card-vazio">
+
+          <div class="card hidden" id="match-swipe-sem-candidatos">
+            <div class="card__vazio">
               <h2>Não há candidatos disponíveis</h2>
               <p>:/</p>
             </div>
           </div>
 
-          <div class="card-for-match" id="card-for-match">
-            <div class="card-match-content">
-              <div class="header-card">
-                <h2 class="titulo-card" id="titulo-card-match"></h2>
+          <div class="card--for-match" id="match-swipe-card">
+            <div class="card--for-match__conteudo">
+              <div class="card__header">
+                <div class="match-swipe__tipo" id="match-swipe-tipo"></div>
+                <h2 class="match-swipe__titulo" id="match-swipe-titulo"></h2>
               </div>
 
-              <div class="dados-candidato hidden" id="dados-candidato-match">
-                <div class="group-dados-candidato">
-                  <label for="descricao-candidato-match">Descrição</label>
-                  <textarea id="descricao-candidato-match" disabled></textarea>
+              <!-- dados do candidato no swipe (visível para empresa) -->
+              <div
+                class="match-swipe__dados-candidato hidden"
+                id="match-swipe-dados-candidato"
+              >
+                <div class="match-swipe__campo-grupo">
+                  <label for="match-swipe-candidato-descricao">Descrição</label>
+                  <textarea
+                    id="match-swipe-candidato-descricao"
+                    disabled
+                  ></textarea>
                 </div>
-
-                <div class="group-dados-candidato">
-                  <label for="lista-competencias-match">Competências</label>
+                <div class="match-swipe__divisor"></div>
+                <div class="match-swipe__campo-grupo">
+                  <label>Competências</label>
                   <!-- prettier-ignore -->
-                  <div class="lista-competencias" id="lista-competencias-match"></div>
+                  <div class="match-swipe__competencias-lista" id="match-swipe-candidato-competencias"></div>
                 </div>
-
                 <!-- prettier-ignore -->
-                <div
-                  id="competencia-template-vaga"
-                  class="competencia-template hidden"
-                >
-                  <span class="competencia-texto"></span>
+                <div id="match-swipe-candidato-competencia-template" class="competencia hidden">
+                  <span class="competencia__texto"></span>
                 </div>
-
-                <div class="group-dados-candidato">
-                  <label for="estado-candidato-match">Estado</label>
-                  <input type="text" id="estado-candidato-match" disabled />
-                </div>
-              </div>
-
-              <div class="dados-vaga hidden" id="dados-vaga-match">
-                <div class="group-dados-vaga">
-                  <label for="descricao-vaga">Descrição da vaga</label>
-                  <textarea id="descricao-vaga-input-match" disabled></textarea>
-                </div>
-                <div class="group-dados-vaga row">
-                  <label for="horario-vaga">Horário:</label>
-                  <input type="text" id="horario-vaga-input-match" disabled />
-                </div>
-                <div class="group-dados-vaga row">
-                  <label for="localizacao-vaga">Localização:</label>
+                <div class="match-swipe__divisor"></div>
+                <div class="match-swipe__campo-grupo">
+                  <label for="match-swipe-candidato-estado">Estado</label>
                   <input
                     type="text"
-                    id="localizacao-vaga-input-match"
+                    id="match-swipe-candidato-estado"
                     disabled
                   />
                 </div>
-                <div class="group-dados-vaga row">
-                  <label for="salario-vaga">Remuneração:</label>
-                  <input type="text" id="salario-vaga-input-match" disabled />
+              </div>
+
+              <!-- dados da vaga no swipe (visível para candidato) -->
+              <div
+                class="match-swipe__dados-vaga hidden"
+                id="match-swipe-dados-vaga"
+              >
+                <div class="match-swipe__campo-grupo">
+                  <label for="match-swipe-vaga-descricao"
+                    >Descrição da vaga</label
+                  >
+                  <textarea id="match-swipe-vaga-descricao" disabled></textarea>
                 </div>
-                <div class="group-dados-vaga">
-                  <label for="requisitos-vaga">Requisitos:</label>
+                <div class="match-swipe__divisor"></div>
+                <div class="match-swipe__campo-grupo row">
+                  <label for="match-swipe-vaga-horario">Horário:</label>
+                  <input type="text" id="match-swipe-vaga-horario" disabled />
+                </div>
+                <div class="match-swipe__campo-grupo row">
+                  <label for="match-swipe-vaga-localizacao">Localização:</label>
+                  <input
+                    type="text"
+                    id="match-swipe-vaga-localizacao"
+                    disabled
+                  />
+                </div>
+                <div class="match-swipe__campo-grupo row">
+                  <label for="match-swipe-vaga-salario">Remuneração:</label>
+                  <input type="text" id="match-swipe-vaga-salario" disabled />
+                </div>
+                <div class="match-swipe__divisor"></div>
+                <div class="match-swipe__campo-grupo">
+                  <label for="match-swipe-vaga-requisitos">Requisitos:</label>
                   <textarea
-                    id="requisitos-vaga-input-match"
+                    id="match-swipe-vaga-requisitos"
                     disabled
                   ></textarea>
                 </div>
               </div>
             </div>
 
-            <div class="btn-area-match">
+            <div class="match-swipe__acoes">
               <img
                 src="./assets/img/like.png"
                 alt="like"
-                class="match-btn like-btn"
-                id="like-btn"
+                class="match-swipe__btn-like"
+                id="match-swipe-btn-like"
               />
               <img
                 src="./assets/img/match-not.png"
                 alt="x"
-                class="match-btn dislike-btn"
-                id="dislike-btn"
+                class="match-swipe__btn-dislike"
+                id="match-swipe-btn-dislike"
               />
             </div>
           </div>
         </section>
 
-        <!-- tela logada com empresa -->
-        <section class="menu-nav hidden" id="menu-nav-empresa">
+        <!-- ========== MENU EMPRESA ========== -->
+        <section class="menu-nav hidden" id="menu-empresa">
           <nav>
-            <ul class="nav-links">
-              <li>
-                <a href="#" id="nav-job-empresa">
+            <ul class="menu-nav__lista">
+              <li class="menu-nav__item">
+                <a href="#" class="menu-nav__link" id="nav-empresa-vagas-match">
                   <img src="assets/img/job.png" alt="" />
                 </a>
               </li>
-              <li>
-                <a href="#" id="nav-vagas-empresa">
+              <li class="menu-nav__item">
+                <a href="#" class="menu-nav__link" id="nav-empresa-vagas">
                   <img src="assets/img/file.png" alt="" />
                 </a>
               </li>
-              <li>
-                <a href="#" id="nav-match-empresa">
+              <li class="menu-nav__item">
+                <a href="#" class="menu-nav__link" id="nav-empresa-matches">
                   <img src="assets/img/match.png" alt="" />
                 </a>
               </li>
-              <li>
-                <a href="#" id="nav-user-empresa">
+              <li class="menu-nav__item">
+                <a href="#" class="menu-nav__link" id="nav-empresa-perfil">
                   <img src="assets/img/user.png" alt="" />
                 </a>
               </li>
@@ -494,229 +633,301 @@
           </nav>
         </section>
 
-        <section class="profile-empresa hidden" id="profile-empresa">
-          <div class="card">
-            <div class="header-card">
-              <div class="foto-empresa" id="foto-empresa"></div>
-
+        <!-- ========== PERFIL EMPRESA ========== -->
+        <section class="perfil-empresa hidden" id="perfil-empresa">
+          <div class="perfil__card">
+            <div class="perfil__header">
+              <div
+                class="perfil-empresa__avatar perfil__avatar"
+                id="perfil-empresa-avatar"
+              ></div>
               <input
                 type="file"
                 accept="image/*"
-                class="input-foto hidden"
-                id="imagem-perfil-empresa"
+                class="hidden"
+                id="perfil-empresa-avatar-input"
               />
-
-              <h2 id="nome-perfil-empresa">Nome da Empresa</h2>
-              <span class="bar-orange-35"></span>
+              <h2 class="perfil__nome" id="perfil-empresa-nome">
+                Nome da Empresa
+              </h2>
             </div>
 
-            <div class="dados-empresa">
-              <div class="group-dados-empresa">
-                <label>Nome</label>
-                <input
-                  type="text"
-                  id="nome-empresa"
-                  pattern="^[A-Za-zÀ-ÿ0-9&.,\- ]+$"
-                  title="Use apenas letras, números e caracteres como . , - &"
-                  required
-                />
-              </div>
-
-              <div class="group-dados-empresa">
-                <label>Email</label>
-                <input
-                  type="email"
-                  id="email-empresa"
-                  pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"
-                  title="Email inválido. Ex: nome@email.com"
-                  required
-                />
-              </div>
-
-              <div class="group-dados-empresa">
-                <label>CNPJ</label>
-                <input
-                  type="text"
-                  id="cnpj-empresa"
-                  placeholder="Digite o CNPJ"
-                  pattern="^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$"
-                  title="Formato: 00.000.000/0000-00"
-                  required
-                />
-              </div>
-
-              <div class="group-dados-empresa">
-                <label>País</label>
-                <input
-                  type="text"
-                  id="pais-empresa"
-                  placeholder="Digite o país"
-                  pattern="^[A-Za-zÀ-ÿ]+(?:\s[A-Za-zÀ-ÿ]+)*$"
-                  title="Digite o nome do país (apenas letras)"
-                  required
-                />
-              </div>
-
-              <div class="group-dados-empresa">
-                <label>Estado</label>
-                <input
-                  type="text"
-                  id="estado-empresa"
-                  placeholder="Digite o estado"
-                  pattern="^[A-Za-zÀ-ÿ]+(?:[ -][A-Za-zÀ-ÿ]+)*$"
-                  title="Digite o nome do estado"
-                  required
-                />
-              </div>
-
-              <div class="group-dados-empresa">
-                <label>CEP</label>
-                <input
-                  type="text"
-                  id="cep-empresa"
-                  placeholder="Digite o CEP"
-                  pattern="^\d{5}-\d{3}$"
-                  title="Formato: 00000-000"
-                  required
-                />
-              </div>
-
-              <div class="group-dados-empresa">
-                <label>Descrição</label>
-                <textarea
-                  class="campo-descricao"
-                  id="descricao-empresa"
-                ></textarea>
-              </div>
-
-              <div class="group-dados-empresa">
-                <label>Senha atual</label>
-                <div class="input-senha">
-                  <input
-                    type="password"
-                    class="campo-senha-atual"
-                    id="senha-atual-empresa"
-                  />
-                  <button type="button" id="toggle-senha-atual-empresa">
-                    👁
-                  </button>
+            <div class="perfil__body">
+              <div class="perfil__secao">
+                <div class="perfil__secao-titulo">Dados da empresa</div>
+                <div class="perfil__grid">
+                  <div class="perfil__campo">
+                    <label>Nome</label>
+                    <input
+                      type="text"
+                      id="perfil-empresa-campo-nome"
+                      pattern="^[A-Za-zÀ-ÿ0-9&.,\- ]+$"
+                      title="Use apenas letras, números e caracteres como . , - &"
+                      required
+                    />
+                  </div>
+                  <div class="perfil__campo">
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      id="perfil-empresa-campo-email"
+                      pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"
+                      title="Email inválido."
+                      required
+                    />
+                  </div>
+                  <div class="perfil__campo">
+                    <label>CNPJ</label>
+                    <input
+                      type="text"
+                      id="perfil-empresa-campo-cnpj"
+                      placeholder="00.000.000/0000-00"
+                      pattern="^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$"
+                      title="Formato: 00.000.000/0000-00"
+                      required
+                    />
+                  </div>
+                  <div class="perfil__campo">
+                    <label>País</label>
+                    <input
+                      type="text"
+                      id="perfil-empresa-campo-pais"
+                      placeholder="País"
+                      pattern="^[A-Za-zÀ-ÿ]+(?:\s[A-Za-zÀ-ÿ]+)*$"
+                      required
+                    />
+                  </div>
+                  <div class="perfil__campo">
+                    <label>Estado</label>
+                    <input
+                      type="text"
+                      id="perfil-empresa-campo-estado"
+                      placeholder="Estado"
+                      pattern="^[A-Za-zÀ-ÿ]+(?:[ -][A-Za-zÀ-ÿ]+)*$"
+                      required
+                    />
+                  </div>
+                  <div class="perfil__campo">
+                    <label>CEP</label>
+                    <input
+                      type="text"
+                      id="perfil-empresa-campo-cep"
+                      placeholder="00000-000"
+                      pattern="^\d{5}-\d{3}$"
+                      required
+                    />
+                  </div>
+                  <div class="perfil__campo perfil__campo--full">
+                    <label>Descrição</label>
+                    <textarea
+                      id="perfil-empresa-campo-descricao"
+                      placeholder="Descreva sua empresa"
+                    ></textarea>
+                  </div>
                 </div>
               </div>
 
-              <div class="group-dados-empresa">
-                <label>Nova senha</label>
-                <div class="input-senha">
-                  <input
-                    type="password"
-                    class="campo-nova-senha"
-                    id="nova-senha-empresa"
-                  />
-                  <button type="button" id="toggle-nova-senha-empresa">
-                    👁
-                  </button>
+              <div class="perfil__secao">
+                <div class="perfil__secao-titulo">Segurança</div>
+                <div class="perfil__grid">
+                  <div class="perfil__campo">
+                    <label>Senha atual</label>
+                    <div class="perfil__senha-wrap">
+                      <input
+                        type="password"
+                        id="perfil-empresa-campo-senha-atual"
+                        placeholder="••••••"
+                      />
+                      <button
+                        type="button"
+                        id="perfil-empresa-toggle-senha-atual"
+                        class="perfil__senha-toggle"
+                      >
+                        👁
+                      </button>
+                    </div>
+                  </div>
+                  <div class="perfil__campo">
+                    <label>Nova senha</label>
+                    <div class="perfil__senha-wrap">
+                      <input
+                        type="password"
+                        id="perfil-empresa-campo-nova-senha"
+                        placeholder="mínimo 6 caracteres"
+                        pattern=".{6,}"
+                        title="Mínimo 6 caracteres"
+                      />
+                      <button
+                        type="button"
+                        id="perfil-empresa-toggle-nova-senha"
+                        class="perfil__senha-toggle"
+                      >
+                        👁
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
+
+              <div class="perfil__secao perfil__secao--acoes">
+                <button
+                  class="perfil__btn-salvar"
+                  id="perfil-empresa-btn-salvar"
+                >
+                  Salvar
+                </button>
+                <button
+                  class="perfil__btn-excluir"
+                  id="perfil-empresa-btn-excluir"
+                >
+                  Excluir conta
+                </button>
+              </div>
             </div>
-
-            <button class="btn" id="btn-salvar-empresa">Salvar</button>
-
-            <button id="btn-excluir-conta-empresa">Excluir conta</button>
           </div>
         </section>
 
+        <!-- ========== VAGAS EMPRESA ========== -->
         <section class="vagas-empresa hidden" id="vagas-empresa">
-          <div class="card" id="card-vagas-empresa">
-            <div class="header-card">
-              <h2>Minhas Vagas</h2>
-              <span class="bar-orange-50"></span>
-              <button class="btn" id="btn-add-vaga">Adicionar vaga</button>
+          <div class="vagas-empresa__card" id="vagas-empresa-card">
+            <div class="vagas-empresa__header">
+              <h2 class="vagas-empresa__titulo">Minhas Vagas</h2>
+              <button
+                class="vagas-empresa__btn-nova"
+                id="vagas-empresa-btn-add"
+              >
+                + Nova vaga
+              </button>
             </div>
 
-            <div class="lista-vagas" id="lista-vagas">
-              <div class="vaga-item hidden">
-                <span>|</span>
-                <h3 class="titulo-vaga-empresa" id="titulo-vaga-empresa"></h3>
+            <div class="vagas-empresa__lista" id="vagas-empresa-lista">
+              <!-- template invisível -->
+              <div class="vagas-empresa__item hidden">
+                <div class="vagas-empresa__item-icone">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"
+                      fill="white"
+                    />
+                    <path
+                      d="M16 3H8L6 7h12l-2-4z"
+                      fill="rgba(255,255,255,0.6)"
+                    />
+                  </svg>
+                </div>
+                <h3 class="vagas-empresa__item-titulo"></h3>
+                <span class="vagas-empresa__item-seta">›</span>
               </div>
             </div>
           </div>
 
-          <div id="popup-competencia-vaga" class="popup hidden">
-            <div class="popup-content">
+          <!-- Popup: adicionar competência à vaga -->
+          <div id="vagas-empresa-popup" class="popup hidden">
+            <div class="popup__content">
               <h3>Adicionar competência</h3>
-
               <input
                 type="text"
-                id="input-competencia-vaga"
+                id="vagas-empresa-popup-input"
                 placeholder="Digite a competência"
               />
-
-              <div class="popup-actions">
-                <button type="button" id="confirmar-competencia-vaga">
+              <div class="popup__actions">
+                <button type="button" id="vagas-empresa-popup-confirmar">
                   Adicionar
                 </button>
-                <button type="button" id="cancelar-competencia-vaga">
+                <button type="button" id="vagas-empresa-popup-cancelar">
                   Cancelar
                 </button>
               </div>
             </div>
           </div>
 
-          <div class="modal-content hidden" id="modal-add-vaga">
-            <h3>Adicionar nova vaga</h3>
+          <!-- Modal: criar/editar vaga -->
+          <div class="vagas-empresa__modal hidden" id="vagas-empresa-modal">
+            <div class="vagas-empresa__modal-header">
+              <h3
+                class="vagas-empresa__modal-titulo"
+                id="vagas-empresa-modal-titulo"
+              >
+                Nova vaga
+              </h3>
+              <button
+                type="button"
+                class="vagas-empresa__modal-fechar"
+                id="vagas-empresa-cancelar-header"
+              >
+                ✕
+              </button>
+            </div>
 
             <form action="">
-              <div class="group-dados-vaga">
-                <input
-                  type="text"
-                  placeholder="titulo da vaga"
-                  id="titulo-vaga-input"
-                />
-              </div>
-              <div class="group-dados-vaga">
-                <label for="descricao-vaga">Descrição da vaga</label>
-                <textarea id="descricao-vaga-input"></textarea>
-              </div>
-              <div class="group-dados-vaga row">
-                <label for="horario-vaga">Horário:</label>
-                <input type="text" id="horario-vaga-input" />
-              </div>
-              <div class="group-dados-vaga row">
-                <label for="localizacao-vaga">Localização:</label>
-                <input type="text" id="localizacao-vaga-input" />
-              </div>
-              <div class="group-dados-vaga row">
-                <label for="salario-vaga">Remuneração:</label>
-                <input type="text" id="salario-vaga-input" />
-              </div>
-              <div class="group-dados-vaga">
-                <label for="requisitos-vaga">Requisitos:</label>
-                <textarea id="requisitos-vaga-input"></textarea>
-              </div>
-
-              <div class="competencias">
-                <button type="button" class="btn" id="btn-add-competencia-vaga">
-                  Adicionar competência
-                </button>
-
+              <div class="vagas-empresa__modal-body">
                 <div
-                  class="lista-competencias"
-                  id="lista-competencias-vaga"
-                ></div>
-
-                <!-- template invisível -->
-                <div
-                  class="competencia-template hidden"
-                  id="competencia-template-vaga"
+                  class="vagas-empresa__campo-grupo vagas-empresa__campo-grupo--titulo"
                 >
-                  <span class="competencia-texto">Categoria</span>
+                  <input
+                    type="text"
+                    placeholder="Título da vaga"
+                    id="vaga-campo-titulo"
+                  />
+                </div>
+
+                <div class="vagas-empresa__secao-titulo">Detalhes</div>
+                <div class="vagas-empresa__campo-grupo">
+                  <label for="vaga-campo-descricao">Descrição</label>
+                  <textarea id="vaga-campo-descricao"></textarea>
+                </div>
+                <div class="vagas-empresa__row">
+                  <div class="vagas-empresa__campo-grupo">
+                    <label for="vaga-campo-horario">Horário</label>
+                    <input type="text" id="vaga-campo-horario" />
+                  </div>
+                  <div class="vagas-empresa__campo-grupo">
+                    <label for="vaga-campo-localizacao">Localização</label>
+                    <input type="text" id="vaga-campo-localizacao" />
+                  </div>
+                </div>
+                <div class="vagas-empresa__campo-grupo">
+                  <label for="vaga-campo-salario">Remuneração</label>
+                  <input type="text" id="vaga-campo-salario" />
+                </div>
+
+                <div class="vagas-empresa__divisor"></div>
+
+                <div class="vagas-empresa__secao-titulo">Requisitos</div>
+                <div class="vagas-empresa__campo-grupo">
+                  <textarea id="vaga-campo-requisitos"></textarea>
+                </div>
+
+                <div class="vagas-empresa__divisor"></div>
+
+                <div class="vagas-empresa__secao-titulo">Competências</div>
+                <button
+                  type="button"
+                  class="perfil__btn-add-comp"
+                  id="vagas-empresa-btn-add-competencia"
+                >
+                  + Adicionar competência
+                </button>
+                <div
+                  class="vagas-empresa__competencias-lista"
+                  id="vagas-empresa-competencias-lista"
+                ></div>
+                <div
+                  class="competencia hidden"
+                  id="vagas-empresa-competencia-template"
+                >
+                  <span class="competencia__texto">Categoria</span>
                 </div>
               </div>
 
-              <div class="modal-actions">
-                <button id="confirmar-add-vaga">Salvar</button>
-                <button type="button" id="cancelar-add-vaga">Cancelar</button>
-
-                <button id="btn-excluir-vaga" type="button">Excluir</button>
+              <div class="vagas-empresa__modal-acoes">
+                <button id="vagas-empresa-confirmar">Salvar</button>
+                <button type="button" id="vagas-empresa-cancelar">
+                  Cancelar
+                </button>
+                <button id="vagas-empresa-btn-excluir" type="button">
+                  Excluir
+                </button>
               </div>
             </form>
           </div>
@@ -727,7 +938,5 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="./assets/js/app.js"></script>
     <script type="module" src="./assets/js/ui/MenuPagination.js"></script>
-    <script type="module" src="./assets/js/auth/AuthController.js"></script>
-    <script type="module" src="./assets/js/auth/AuthService.js"></script>
   </body>
 </html>

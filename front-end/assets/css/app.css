@@ -71,14 +71,15 @@ div.container {
 main {
   height: 90vh;
   width: 50%;
+  border-radius: 0.5rem;
   background-color: rgba(202, 202, 202, 0.952);
-  box-shadow: 0.1rem 0.2rem 2rem -0.6rem #00000099;
+  box-shadow: 0.1rem 0.2rem 8rem -0.6rem #00000099;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
 
-img#log-out {
+img#btn-logout {
   position: absolute;
   top: 5%;
   right: 27%;
@@ -92,7 +93,7 @@ img#log-out {
     width: 70%;
   }
 
-  img#log-out {
+  img#btn-logout {
     right: 19%;
   }
 }
@@ -107,7 +108,7 @@ img#log-out {
     height: 95vh;
   }
 
-  img#log-out {
+  img#btn-logout {
     top: 3%;
     right: 5%;
   }
@@ -124,7 +125,7 @@ img#log-out {
     height: 100vh;
   }
 
-  img#log-out {
+  img#btn-logout {
     right: 5%;
   }
 }

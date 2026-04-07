@@ -61,36 +61,40 @@ export class MatchController<T> {
       return;
     }
 
-    document.getElementById("card-for-match")?.classList.remove("hidden");
+    document.getElementById("match-swipe-card")?.classList.remove("hidden");
 
     this.showCurrent();
 
-    document.getElementById("like-btn")?.addEventListener("click", () => {
-      const current = this.items[this.index];
-      if (!current) return;
+    document
+      .getElementById("match-swipe-btn-like")
+      ?.addEventListener("click", () => {
+        const current = this.items[this.index];
+        if (!current) return;
 
-      this.onLike(current);
-      this.next();
-    });
+        this.onLike(current);
+        this.next();
+      });
 
-    document.getElementById("dislike-btn")?.addEventListener("click", () => {
-      const current = this.items[this.index];
-      if (!current) return;
+    document
+      .getElementById("match-swipe-btn-dislike")
+      ?.addEventListener("click", () => {
+        const current = this.items[this.index];
+        if (!current) return;
 
-      this.items.splice(this.index, 1);
+        this.items.splice(this.index, 1);
 
-      if (!this.items.length) {
-        this.onEmpty();
-        return;
-      }
+        if (!this.items.length) {
+          this.onEmpty();
+          return;
+        }
 
-      if (this.index >= this.items.length) {
-        this.onEmpty();
-        return;
-      }
+        if (this.index >= this.items.length) {
+          this.onEmpty();
+          return;
+        }
 
-      this.showCurrent();
-    });
+        this.showCurrent();
+      });
   }
 
   private showCurrent(): void {

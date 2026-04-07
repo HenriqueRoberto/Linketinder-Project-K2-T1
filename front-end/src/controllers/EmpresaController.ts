@@ -13,8 +13,8 @@ export class EmpresaController {
   }
 
   private init(): void {
-    document.getElementById("menu-nav-empresa")?.classList.remove("hidden");
-    document.getElementById("profile-empresa")?.classList.remove("hidden");
+    document.getElementById("menu-empresa")?.classList.remove("hidden");
+    document.getElementById("perfil-empresa")?.classList.remove("hidden");
 
     this.load();
     this.events();
@@ -36,64 +36,83 @@ export class EmpresaController {
 
   private load(): void {
     (
-      document.getElementById("nome-perfil-empresa") as HTMLElement
+      document.getElementById("perfil-empresa-nome") as HTMLElement
     ).textContent = this.user.nome;
 
-    this.input("nome-empresa").value = this.user.nome;
-    this.input("email-empresa").value = this.user.email;
-    this.input("cnpj-empresa").value = this.user.cnpj;
-    this.input("pais-empresa").value = this.user.pais;
-    this.input("estado-empresa").value = this.user.estado;
-    this.input("cep-empresa").value = this.user.cep;
-    this.textarea("descricao-empresa").value = this.user.descricao;
+    this.input("perfil-empresa-campo-nome").value = this.user.nome;
+    this.input("perfil-empresa-campo-email").value = this.user.email;
+    this.input("perfil-empresa-campo-cnpj").value = this.user.cnpj;
+    this.input("perfil-empresa-campo-pais").value = this.user.pais;
+    this.input("perfil-empresa-campo-estado").value = this.user.estado;
+    this.input("perfil-empresa-campo-cep").value = this.user.cep;
+    this.textarea("perfil-empresa-campo-descricao").value = this.user.descricao;
 
+    const fotoEl = document.getElementById(
+      "perfil-empresa-avatar",
+    ) as HTMLDivElement;
     if (this.user.foto) {
       this.fotoBase64 = this.user.foto;
-
-      const foto = document.getElementById("foto-empresa") as HTMLDivElement;
-      foto.style.backgroundImage = `url(${this.user.foto})`;
-      foto.style.backgroundSize = "cover";
-      foto.style.backgroundPosition = "center";
+      fotoEl.style.backgroundImage = `url(${this.user.foto})`;
+      fotoEl.style.backgroundSize = "cover";
+      fotoEl.style.backgroundPosition = "center";
+      fotoEl.textContent = "";
+    } else {
+      const iniciais = this.user.nome
+        .split(" ")
+        .map((n: string) => n[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase();
+      fotoEl.textContent = iniciais;
     }
   }
 
   private events(): void {
+    document.getElementById("btn-logout")?.addEventListener("click", () => {
+      StorageService.clearCurrentUser();
+      window.location.href = "auth.html";
+    });
+
     document
-      .getElementById("btn-salvar-empresa")
+      .getElementById("perfil-empresa-btn-salvar")
       ?.addEventListener("click", () => this.save());
 
-    const foto = document.getElementById("foto-empresa");
+    const foto = document.getElementById("perfil-empresa-avatar");
     const inputFoto = document.getElementById(
-      "imagem-perfil-empresa",
+      "perfil-empresa-avatar-input",
     ) as HTMLInputElement;
 
     foto?.addEventListener("click", () => inputFoto.click());
     inputFoto?.addEventListener("change", (e) => this.handleFoto(e));
 
     document
-      .getElementById("btn-fechar-card")
+      .getElementById("modal-vaga-btn-fechar")
       ?.addEventListener("click", () => {
-        document.getElementById("view-vaga")?.classList.add("hidden");
+        document.getElementById("modal-vaga")?.classList.add("hidden");
       });
 
     document
-      .getElementById("btn-fechar-card-candidato")
+      .getElementById("modal-candidato-btn-fechar")
       ?.addEventListener("click", () => {
-        document
-          .getElementById("candidato-view-dados")
-          ?.classList.add("hidden");
+        document.getElementById("modal-candidato")?.classList.add("hidden");
       });
 
     document
-      .getElementById("btn-excluir-conta-empresa")
+      .getElementById("perfil-empresa-btn-excluir")
       ?.addEventListener("click", () => this.deleteAccount());
 
     document
-      .getElementById("btn-excluir-vaga")
+      .getElementById("vagas-empresa-btn-excluir")
       ?.addEventListener("click", () => this.deleteCurrentVaga());
 
-    this.togglePassword("senha-atual-empresa", "toggle-senha-atual-empresa");
-    this.togglePassword("nova-senha-empresa", "toggle-nova-senha-empresa");
+    this.togglePassword(
+      "perfil-empresa-campo-senha-atual",
+      "perfil-empresa-toggle-senha-atual",
+    );
+    this.togglePassword(
+      "perfil-empresa-campo-nova-senha",
+      "perfil-empresa-toggle-nova-senha",
+    );
   }
 
   private handleFoto(e: Event): void {
@@ -107,10 +126,13 @@ export class EmpresaController {
     reader.onload = () => {
       this.fotoBase64 = reader.result as string;
 
-      const foto = document.getElementById("foto-empresa") as HTMLDivElement;
+      const foto = document.getElementById(
+        "perfil-empresa-avatar",
+      ) as HTMLDivElement;
       foto.style.backgroundImage = `url(${this.fotoBase64})`;
       foto.style.backgroundSize = "cover";
       foto.style.backgroundPosition = "center";
+      foto.textContent = "";
     };
 
     reader.readAsDataURL(file);
@@ -119,23 +141,32 @@ export class EmpresaController {
   private save(): void {
     const current = StorageService.getCurrentUser() as Empresa;
 
-    const senhaAtualDigitada = this.input("senha-atual-empresa").value.trim();
-    const novaSenha = this.input("nova-senha-empresa").value.trim();
+    const senhaAtualDigitada = this.input(
+      "perfil-empresa-campo-senha-atual",
+    ).value.trim();
+    const novaSenha = this.input(
+      "perfil-empresa-campo-nova-senha",
+    ).value.trim();
 
     if (senhaAtualDigitada && senhaAtualDigitada !== current.senha) {
       alert("Senha atual incorreta.");
       return;
     }
 
+    if (novaSenha && novaSenha.length < 6) {
+      alert("A nova senha deve ter pelo menos 6 caracteres.");
+      return;
+    }
+
     const updated: Empresa = {
       ...current,
-      nome: this.input("nome-empresa").value,
-      email: this.input("email-empresa").value,
-      cnpj: this.input("cnpj-empresa").value,
-      pais: this.input("pais-empresa").value,
-      estado: this.input("estado-empresa").value,
-      cep: this.input("cep-empresa").value,
-      descricao: this.textarea("descricao-empresa").value,
+      nome: this.input("perfil-empresa-campo-nome").value,
+      email: this.input("perfil-empresa-campo-email").value,
+      cnpj: this.input("perfil-empresa-campo-cnpj").value,
+      pais: this.input("perfil-empresa-campo-pais").value,
+      estado: this.input("perfil-empresa-campo-estado").value,
+      cep: this.input("perfil-empresa-campo-cep").value,
+      descricao: this.textarea("perfil-empresa-campo-descricao").value,
       foto: this.fotoBase64 || current.foto,
       senha: novaSenha || current.senha,
     };
@@ -144,11 +175,11 @@ export class EmpresaController {
     this.user = updated;
 
     (
-      document.querySelector(".nome-perfil-empresa") as HTMLElement
+      document.getElementById("perfil-empresa-nome") as HTMLElement
     ).textContent = updated.nome;
 
-    this.input("senha-atual-empresa").value = "";
-    this.input("nova-senha-empresa").value = "";
+    this.input("perfil-empresa-campo-senha-atual").value = "";
+    this.input("perfil-empresa-campo-nova-senha").value = "";
 
     alert("Salvo!");
   }
@@ -175,22 +206,30 @@ export class EmpresaController {
   // ================= VAGAS =================
 
   private vagas(): void {
-    const btn = document.getElementById("btn-add-vaga");
-    const modal = document.getElementById("modal-add-vaga");
-    const cancelar = document.getElementById("cancelar-add-vaga");
+    const btn = document.getElementById("vagas-empresa-btn-add");
+    const modal = document.getElementById("vagas-empresa-modal");
+    const cancelar = document.getElementById("vagas-empresa-cancelar");
+    const cancelarHeader = document.getElementById(
+      "vagas-empresa-cancelar-header",
+    );
     const form = modal?.querySelector("form");
 
     btn?.addEventListener("click", () => {
       this.vagaEmEdicaoId = null;
       this.resetModal();
+      const tituloModal = document.getElementById("vagas-empresa-modal-titulo");
+      if (tituloModal) tituloModal.textContent = "Nova vaga";
       modal?.classList.remove("hidden");
     });
 
-    cancelar?.addEventListener("click", (e) => {
+    const fecharModal = (e: Event) => {
       e.preventDefault();
       modal?.classList.add("hidden");
       this.resetModal();
-    });
+    };
+
+    cancelar?.addEventListener("click", fecharModal);
+    cancelarHeader?.addEventListener("click", fecharModal);
 
     form?.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -206,12 +245,12 @@ export class EmpresaController {
     const vaga: Vaga = {
       id: this.vagaEmEdicaoId || crypto.randomUUID(),
       empresaId: this.user.id,
-      titulo: this.input("titulo-vaga-input").value,
-      descricao: this.textarea("descricao-vaga-input").value,
-      horario: this.input("horario-vaga-input").value,
-      localizacao: this.input("localizacao-vaga-input").value,
-      remuneracao: this.input("salario-vaga-input").value,
-      requisitos: this.textarea("requisitos-vaga-input").value,
+      titulo: this.input("vaga-campo-titulo").value,
+      descricao: this.textarea("vaga-campo-descricao").value,
+      horario: this.input("vaga-campo-horario").value,
+      localizacao: this.input("vaga-campo-localizacao").value,
+      remuneracao: this.input("vaga-campo-salario").value,
+      requisitos: this.textarea("vaga-campo-requisitos").value,
       competencias: [...this.competenciasVaga],
     };
 
@@ -231,8 +270,10 @@ export class EmpresaController {
   }
 
   private renderVagas(): void {
-    const lista = document.getElementById("lista-vagas");
-    const template = lista?.querySelector(".vaga-item") as HTMLElement;
+    const lista = document.getElementById("vagas-empresa-lista");
+    const template = lista?.querySelector(
+      ".vagas-empresa__item",
+    ) as HTMLElement;
 
     if (!lista || !template) return;
 
@@ -244,7 +285,9 @@ export class EmpresaController {
       const item = template.cloneNode(true) as HTMLElement;
       item.classList.remove("hidden");
 
-      const titulo = item.querySelector(".titulo-vaga-empresa") as HTMLElement;
+      const titulo = item.querySelector(
+        ".vagas-empresa__item-titulo",
+      ) as HTMLElement;
       titulo.textContent = vaga.titulo;
 
       item.addEventListener("click", () => this.openEditVaga(vaga));
@@ -257,29 +300,32 @@ export class EmpresaController {
     this.vagaEmEdicaoId = vaga.id;
     this.competenciasVaga = [...vaga.competencias];
 
-    this.input("titulo-vaga-input").value = vaga.titulo;
-    this.textarea("descricao-vaga-input").value = vaga.descricao;
-    this.input("horario-vaga-input").value = vaga.horario;
-    this.input("localizacao-vaga-input").value = vaga.localizacao;
-    this.input("salario-vaga-input").value = vaga.remuneracao;
-    this.textarea("requisitos-vaga-input").value = vaga.requisitos;
+    this.input("vaga-campo-titulo").value = vaga.titulo;
+    this.textarea("vaga-campo-descricao").value = vaga.descricao;
+    this.input("vaga-campo-horario").value = vaga.horario;
+    this.input("vaga-campo-localizacao").value = vaga.localizacao;
+    this.input("vaga-campo-salario").value = vaga.remuneracao;
+    this.textarea("vaga-campo-requisitos").value = vaga.requisitos;
+
+    const tituloModal = document.getElementById("vagas-empresa-modal-titulo");
+    if (tituloModal) tituloModal.textContent = "Editar vaga";
 
     this.renderCompetenciasModal();
-    document.getElementById("modal-add-vaga")?.classList.remove("hidden");
+    document.getElementById("vagas-empresa-modal")?.classList.remove("hidden");
   }
 
   private resetModal(): void {
     this.vagaEmEdicaoId = null;
     this.competenciasVaga = [];
 
-    this.input("titulo-vaga-input").value = "";
-    this.textarea("descricao-vaga-input").value = "";
-    this.input("horario-vaga-input").value = "";
-    this.input("localizacao-vaga-input").value = "";
-    this.input("salario-vaga-input").value = "";
-    this.textarea("requisitos-vaga-input").value = "";
+    this.input("vaga-campo-titulo").value = "";
+    this.textarea("vaga-campo-descricao").value = "";
+    this.input("vaga-campo-horario").value = "";
+    this.input("vaga-campo-localizacao").value = "";
+    this.input("vaga-campo-salario").value = "";
+    this.textarea("vaga-campo-requisitos").value = "";
 
-    document.getElementById("lista-competencias-vaga")!.innerHTML = "";
+    document.getElementById("vagas-empresa-competencias-lista")!.innerHTML = "";
   }
 
   private deleteCurrentVaga(): void {
@@ -291,7 +337,7 @@ export class EmpresaController {
     const updated = StorageService.getCurrentUser() as Empresa;
     this.user = updated;
 
-    document.getElementById("modal-add-vaga")?.classList.add("hidden");
+    document.getElementById("vagas-empresa-modal")?.classList.add("hidden");
     this.resetModal();
     this.renderVagas();
     this.renderMatches();
@@ -301,13 +347,13 @@ export class EmpresaController {
   // ================= COMPETENCIAS =================
 
   private competenciasModal(): void {
-    const btn = document.getElementById("btn-add-competencia-vaga");
-    const popup = document.getElementById("popup-competencia-vaga");
+    const btn = document.getElementById("vagas-empresa-btn-add-competencia");
+    const popup = document.getElementById("vagas-empresa-popup");
     const input = document.getElementById(
-      "input-competencia-vaga",
+      "vagas-empresa-popup-input",
     ) as HTMLInputElement;
-    const confirmar = document.getElementById("confirmar-competencia-vaga");
-    const cancelar = document.getElementById("cancelar-competencia-vaga");
+    const confirmar = document.getElementById("vagas-empresa-popup-confirmar");
+    const cancelar = document.getElementById("vagas-empresa-popup-cancelar");
 
     const regex = /^[A-Za-zÀ-ÿ0-9.+#-]{2,30}(?:\s[A-Za-zÀ-ÿ0-9.+#-]{2,30})*$/;
 
@@ -349,9 +395,9 @@ export class EmpresaController {
     });
   }
   private renderCompetenciasModal(): void {
-    const lista = document.getElementById("lista-competencias-vaga");
+    const lista = document.getElementById("vagas-empresa-competencias-lista");
     const template = document.getElementById(
-      "competencia-template-vaga",
+      "vagas-empresa-competencia-template",
     ) as HTMLElement;
 
     if (!lista || !template) return;
@@ -364,7 +410,7 @@ export class EmpresaController {
       item.classList.remove("hidden");
       item.removeAttribute("id");
 
-      const texto = item.querySelector(".competencia-texto");
+      const texto = item.querySelector(".competencia__texto");
       if (texto) texto.textContent = competencia;
 
       item.addEventListener("click", () => {
@@ -398,31 +444,37 @@ export class EmpresaController {
   }
 
   private renderCardCandidato(c: Candidato): void {
-    document.getElementById("card-for-match")?.classList.remove("hidden");
-    document.getElementById("card-sem-candidatos")?.classList.add("hidden");
-    document.getElementById("card-sem-vagas")?.classList.add("hidden");
+    document.getElementById("match-swipe-card")?.classList.remove("hidden");
+    document
+      .getElementById("match-swipe-sem-candidatos")
+      ?.classList.add("hidden");
+    document.getElementById("match-swipe-sem-vagas")?.classList.add("hidden");
 
     document
-      .getElementById("dados-candidato-match")
+      .getElementById("match-swipe-dados-candidato")
       ?.classList.remove("hidden");
-    document.getElementById("dados-vaga-match")?.classList.add("hidden");
+    document.getElementById("match-swipe-dados-vaga")?.classList.add("hidden");
 
-    (document.getElementById("titulo-card-match") as HTMLElement).textContent =
-      c.nome;
+    const tipoEl = document.getElementById("match-swipe-tipo") as HTMLElement;
+    if (tipoEl) tipoEl.textContent = "";
+    (document.getElementById("match-swipe-titulo") as HTMLElement).textContent =
+      "Perfil Anônimo";
 
     (
       document.getElementById(
-        "descricao-candidato-match",
+        "match-swipe-candidato-descricao",
       ) as HTMLTextAreaElement
     ).value = c.descricao || "";
 
     (
-      document.getElementById("estado-candidato-match") as HTMLInputElement
+      document.getElementById(
+        "match-swipe-candidato-estado",
+      ) as HTMLInputElement
     ).value = c.estado || "";
 
-    const lista = document.getElementById("lista-competencias-match");
+    const lista = document.getElementById("match-swipe-candidato-competencias");
     const template = document.getElementById(
-      "competencia-template-vaga",
+      "vagas-empresa-competencia-template",
     ) as HTMLElement;
 
     if (!lista || !template) return;
@@ -432,23 +484,25 @@ export class EmpresaController {
     c.competencias.forEach((competencia) => {
       const item = template.cloneNode(true) as HTMLElement;
       item.classList.remove("hidden");
-      item.querySelector(".competencia-texto")!.textContent = competencia;
+      item.querySelector(".competencia__texto")!.textContent = competencia;
       lista.appendChild(item);
     });
   }
 
   private showSemCandidatos(): void {
-    document.getElementById("card-for-match")?.classList.add("hidden");
-    document.getElementById("card-sem-candidatos")?.classList.remove("hidden");
-    document.getElementById("card-sem-vagas")?.classList.add("hidden");
+    document.getElementById("match-swipe-card")?.classList.add("hidden");
+    document
+      .getElementById("match-swipe-sem-candidatos")
+      ?.classList.remove("hidden");
+    document.getElementById("match-swipe-sem-vagas")?.classList.add("hidden");
   }
 
   // ================= MATCH LIST =================
 
   private renderMatches(): void {
-    const lista = document.getElementById("match-list");
-    const template = lista?.querySelector(".match-item") as HTMLElement;
-    const drop = document.getElementById("drop-empresa-menu-candidato");
+    const lista = document.getElementById("matches-lista");
+    const template = lista?.querySelector(".matches__item") as HTMLElement;
+    const drop = document.getElementById("matches-dropdown");
 
     if (!lista || !template || !drop) return;
 
@@ -473,7 +527,7 @@ export class EmpresaController {
       const item = template.cloneNode(true) as HTMLElement;
       item.classList.remove("hidden");
 
-      const titulo = item.querySelector(".titulo-vaga") as HTMLElement;
+      const titulo = item.querySelector(".matches__item-titulo") as HTMLElement;
       const arrow = item.querySelector(".arrow") as HTMLElement | null;
 
       if (!titulo || !arrow) return;
@@ -497,7 +551,7 @@ export class EmpresaController {
         }
 
         const ul = drop.querySelector(
-          "#candidato-list",
+          "#matches-dropdown-lista",
         ) as HTMLUListElement | null;
         if (!ul) return;
 
@@ -520,7 +574,7 @@ export class EmpresaController {
           liNumero.textContent = `#${index + 1}`;
 
           const candidatoItem = document.createElement("ul");
-          candidatoItem.className = "candidato-list";
+          candidatoItem.className = "matches-dropdown-lista";
 
           candidatoItem.appendChild(liNome);
           candidatoItem.appendChild(liNumero);
@@ -559,42 +613,48 @@ export class EmpresaController {
   // ================= CANDIDATO VIEW =================
 
   private openCandidatoView(c: Candidato): void {
-    document.getElementById("candidato-view-dados")?.classList.remove("hidden");
+    document.getElementById("modal-candidato")?.classList.remove("hidden");
 
     (
-      document.getElementById("nome-candidato-view") as HTMLElement
+      document.getElementById("modal-candidato-titulo") as HTMLElement
     ).textContent = c.nome;
 
     const emailInput = document.getElementById(
-      "email-candidato-view",
+      "modal-candidato-campo-email",
     ) as HTMLInputElement | null;
     const emailInputComEspaco = document.getElementById(
-      "email-candidato-view  ",
+      "modal-candidato-campo-email",
     ) as HTMLInputElement | null;
     const email = emailInput || emailInputComEspaco;
     if (email) email.value = c.email;
 
-    (document.getElementById("cpf-candidato-view") as HTMLInputElement).value =
-      c.cpf;
+    (
+      document.getElementById("modal-candidato-campo-cpf") as HTMLInputElement
+    ).value = c.cpf;
 
     (
-      document.getElementById("idade-candidato-view") as HTMLInputElement
+      document.getElementById("modal-candidato-campo-idade") as HTMLInputElement
     ).value = c.idade;
 
     (
-      document.getElementById("estado-candidato-view") as HTMLInputElement
+      document.getElementById(
+        "modal-candidato-campo-estado",
+      ) as HTMLInputElement
     ).value = c.estado;
 
-    (document.getElementById("cep-candidato-view") as HTMLInputElement).value =
-      c.cep;
+    (
+      document.getElementById("modal-candidato-campo-cep") as HTMLInputElement
+    ).value = c.cep;
 
     (
-      document.getElementById("descricao-candidato-view") as HTMLTextAreaElement
+      document.getElementById(
+        "modal-candidato-campo-descricao",
+      ) as HTMLTextAreaElement
     ).value = c.descricao;
 
-    const lista = document.getElementById("lista-competencias");
+    const lista = document.getElementById("modal-candidato-competencias-lista");
     const template = document.getElementById(
-      "competencia-template",
+      "modal-candidato-competencia-template",
     ) as HTMLElement;
 
     if (!lista || !template) return;
@@ -604,7 +664,7 @@ export class EmpresaController {
     c.competencias.forEach((competencia) => {
       const item = template.cloneNode(true) as HTMLElement;
       item.classList.remove("hidden");
-      item.querySelector(".competencia-texto")!.textContent = competencia;
+      item.querySelector(".competencia__texto")!.textContent = competencia;
       lista.appendChild(item);
     });
   }
@@ -638,7 +698,7 @@ export class EmpresaController {
 
   private renderGrafico(vaga: Vaga): void {
     const canvas = document.getElementById(
-      "grafico-competencias",
+      "modal-vaga-grafico",
     ) as HTMLCanvasElement | null;
 
     if (!canvas) return;
@@ -694,29 +754,44 @@ export class EmpresaController {
   // ================= VAGA VIEW =================
 
   private openVagaView(vaga: Vaga): void {
-    document.getElementById("view-vaga")?.classList.remove("hidden");
-    document.getElementById("empresa-view-dados")?.classList.add("hidden");
+    document.getElementById("modal-vaga")?.classList.remove("hidden");
+    document
+      .getElementById("modal-vaga-dados-empresa")
+      ?.classList.add("hidden");
 
-    (document.getElementById("titulo-vaga-card") as HTMLElement).textContent =
+    (document.getElementById("modal-vaga-titulo") as HTMLElement).textContent =
       vaga.titulo;
 
-    (document.getElementById("descricao-vaga") as HTMLTextAreaElement).value =
-      vaga.descricao || "";
-
-    (document.getElementById("horario-vaga") as HTMLInputElement).value =
-      vaga.horario || "";
-
-    (document.getElementById("localizacao-vaga") as HTMLInputElement).value =
-      vaga.localizacao || "";
-
-    (document.getElementById("salario-vaga") as HTMLInputElement).value =
-      vaga.remuneracao || "";
-
-    (document.getElementById("requisitos-vaga") as HTMLTextAreaElement).value =
-      vaga.requisitos || "";
+    (
+      document.getElementById(
+        "modal-vaga-campo-descricao",
+      ) as HTMLTextAreaElement
+    ).value = vaga.descricao || "";
 
     (
-      document.getElementById("competencias-vaga") as HTMLTextAreaElement
+      document.getElementById("modal-vaga-campo-horario") as HTMLInputElement
+    ).value = vaga.horario || "";
+
+    (
+      document.getElementById(
+        "modal-vaga-campo-localizacao",
+      ) as HTMLInputElement
+    ).value = vaga.localizacao || "";
+
+    (
+      document.getElementById("modal-vaga-campo-salario") as HTMLInputElement
+    ).value = vaga.remuneracao || "";
+
+    (
+      document.getElementById(
+        "modal-vaga-campo-requisitos",
+      ) as HTMLTextAreaElement
+    ).value = vaga.requisitos || "";
+
+    (
+      document.getElementById(
+        "modal-vaga-campo-competencias",
+      ) as HTMLTextAreaElement
     ).value = vaga.competencias.join(", ");
 
     this.renderGrafico(vaga);
