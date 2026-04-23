@@ -9,60 +9,17 @@ import java.sql.ResultSet
 class VagaDAO {
 
     static List<Vaga> listarPorEmpresa(int idEmpresa) {
-        List<Vaga> vagas = []
         Connection conn = ConexaoBanco.obterConexao()
-
-        String sql = "SELECT * FROM vagas WHERE id_empresa = ? ORDER BY id"
-        PreparedStatement stmt = conn.prepareStatement(sql)
-        stmt.setInt(1, idEmpresa)
-        ResultSet rs = stmt.executeQuery()
-
-        while (rs.next()) {
-            Vaga v = new Vaga(
-                    rs.getString("nome"),
-                    rs.getString("descricao"),
-                    rs.getString("horario"),
-                    rs.getString("localizacao"),
-                    rs.getString("remuneracao"),
-                    [],
-                    rs.getInt("id_empresa")
-            )
-            v.id = rs.getInt("id")
-            v.competencias = buscarCompetenciasDaVaga(conn, v.id)
-            vagas.add(v)
+        List<Vaga> vagas = consultarVagas(conn, "SELECT * FROM vagas WHERE id_empresa = ? ORDER BY id") { stmt ->
+            stmt.setInt(1, idEmpresa)
         }
-
-        rs.close()
-        stmt.close()
         conn.close()
         return vagas
     }
 
     static List<Vaga> listarTodas() {
-        List<Vaga> vagas = []
         Connection conn = ConexaoBanco.obterConexao()
-
-        String sql = "SELECT * FROM vagas ORDER BY id"
-        PreparedStatement stmt = conn.prepareStatement(sql)
-        ResultSet rs = stmt.executeQuery()
-
-        while (rs.next()) {
-            Vaga v = new Vaga(
-                    rs.getString("nome"),
-                    rs.getString("descricao"),
-                    rs.getString("horario"),
-                    rs.getString("localizacao"),
-                    rs.getString("remuneracao"),
-                    [],
-                    rs.getInt("id_empresa")
-            )
-            v.id = rs.getInt("id")
-            v.competencias = buscarCompetenciasDaVaga(conn, v.id)
-            vagas.add(v)
-        }
-
-        rs.close()
-        stmt.close()
+        List<Vaga> vagas = consultarVagas(conn, "SELECT * FROM vagas ORDER BY id") { stmt -> }
         conn.close()
         return vagas
     }
@@ -75,23 +32,11 @@ class VagaDAO {
             VALUES (?, ?, ?, ?, ?, ?)
         """
         PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)
-        stmt.setString(1, vaga.nome)
-        stmt.setString(2, vaga.descricao)
-        stmt.setString(3, vaga.horario)
-        stmt.setString(4, vaga.localizacao)
-        stmt.setString(5, vaga.remuneracao)
-        stmt.setInt   (6, vaga.idEmpresa)
+        preencherParametrosVaga(stmt, vaga)
         stmt.executeUpdate()
 
-        ResultSet chaves = stmt.getGeneratedKeys()
-        int idGerado = 0
-        if (chaves.next()) {
-            idGerado = chaves.getInt(1)
-        }
-
-        chaves.close()
-        stmt.close()
-        conn.close()
+        int idGerado = extrairIdGerado(stmt)
+        stmt.close(); conn.close()
         return idGerado
     }
 
@@ -112,20 +57,15 @@ class VagaDAO {
         stmt.setInt   (6, vaga.id)
         stmt.executeUpdate()
 
-        stmt.close()
-        conn.close()
+        stmt.close(); conn.close()
     }
 
     static void deletar(int id) {
         Connection conn = ConexaoBanco.obterConexao()
-
-        String sql = "DELETE FROM vagas WHERE id = ?"
-        PreparedStatement stmt = conn.prepareStatement(sql)
+        PreparedStatement stmt = conn.prepareStatement("DELETE FROM vagas WHERE id = ?")
         stmt.setInt(1, id)
         stmt.executeUpdate()
-
-        stmt.close()
-        conn.close()
+        stmt.close(); conn.close()
     }
 
     static List<Competencia> buscarCompetenciasDaVaga(Connection conn, int idVaga) {
@@ -147,8 +87,53 @@ class VagaDAO {
             competencias.add(comp)
         }
 
-        rs.close()
-        stmt.close()
+        rs.close(); stmt.close()
         return competencias
+    }
+
+    private static List<Vaga> consultarVagas(Connection conn, String sql, Closure configurarStmt) {
+        List<Vaga> vagas = []
+        PreparedStatement stmt = conn.prepareStatement(sql)
+        configurarStmt(stmt)
+        ResultSet rs = stmt.executeQuery()
+
+        while (rs.next()) {
+            Vaga v = mapearVaga(rs)
+            v.competencias = buscarCompetenciasDaVaga(conn, v.id)
+            vagas.add(v)
+        }
+
+        rs.close(); stmt.close()
+        return vagas
+    }
+
+    private static Vaga mapearVaga(ResultSet rs) {
+        Vaga v = new Vaga(
+                rs.getString("nome"),
+                rs.getString("descricao"),
+                rs.getString("horario"),
+                rs.getString("localizacao"),
+                rs.getString("remuneracao"),
+                [],
+                rs.getInt("id_empresa")
+        )
+        v.id = rs.getInt("id")
+        return v
+    }
+
+    private static void preencherParametrosVaga(PreparedStatement stmt, Vaga vaga) {
+        stmt.setString(1, vaga.nome)
+        stmt.setString(2, vaga.descricao)
+        stmt.setString(3, vaga.horario)
+        stmt.setString(4, vaga.localizacao)
+        stmt.setString(5, vaga.remuneracao)
+        stmt.setInt   (6, vaga.idEmpresa)
+    }
+
+    private static int extrairIdGerado(PreparedStatement stmt) {
+        ResultSet chaves = stmt.getGeneratedKeys()
+        int id = chaves.next() ? chaves.getInt(1) : 0
+        chaves.close()
+        return id
     }
 }

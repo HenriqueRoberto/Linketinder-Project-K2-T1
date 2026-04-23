@@ -8,39 +8,23 @@ import java.sql.ResultSet
 
 class CandidatoDAO {
 
-    // Retorna todos os candidatos com suas competências
     static List<Candidato> listar() {
         List<Candidato> candidatos = []
         Connection conn = ConexaoBanco.obterConexao()
 
-        String sql = "SELECT * FROM candidatos ORDER BY id"
-        PreparedStatement stmt = conn.prepareStatement(sql)
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM candidatos ORDER BY id")
         ResultSet rs = stmt.executeQuery()
 
         while (rs.next()) {
-            Candidato c = new Candidato(
-                    rs.getString("nome"),
-                    rs.getString("email"),
-                    rs.getString("cpf"),
-                    rs.getInt("idade"),
-                    rs.getString("estado"),
-                    rs.getString("cep"),
-                    rs.getString("descricao"),
-                    [],
-                    rs.getString("senha")
-            )
-            c.id = rs.getInt("id")
+            Candidato c = mapearCandidato(rs)
             c.competencias = buscarCompetenciasDoCandidato(conn, c.id)
             candidatos.add(c)
         }
 
-        rs.close()
-        stmt.close()
-        conn.close()
+        rs.close(); stmt.close(); conn.close()
         return candidatos
     }
 
-    // Insere candidato e retorna o id gerado pelo banco
     static int inserir(Candidato candidato) {
         Connection conn = ConexaoBanco.obterConexao()
 
@@ -49,29 +33,14 @@ class CandidatoDAO {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """
         PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)
-        stmt.setString(1, candidato.nome)
-        stmt.setString(2, candidato.email)
-        stmt.setString(3, candidato.cpf)
-        stmt.setInt   (4, candidato.idade)
-        stmt.setString(5, candidato.estado)
-        stmt.setString(6, candidato.cep)
-        stmt.setString(7, candidato.descricao)
-        stmt.setString(8, candidato.senha)
+        preencherParametrosCandidato(stmt, candidato)
         stmt.executeUpdate()
 
-        ResultSet chaves = stmt.getGeneratedKeys()
-        int idGerado = 0
-        if (chaves.next()) {
-            idGerado = chaves.getInt(1)
-        }
-
-        chaves.close()
-        stmt.close()
-        conn.close()
+        int idGerado = extrairIdGerado(stmt)
+        stmt.close(); conn.close()
         return idGerado
     }
 
-    // Atualiza os dados do candidato pelo id
     static void atualizar(Candidato candidato) {
         Connection conn = ConexaoBanco.obterConexao()
 
@@ -81,35 +50,21 @@ class CandidatoDAO {
             WHERE id=?
         """
         PreparedStatement stmt = conn.prepareStatement(sql)
-        stmt.setString(1, candidato.nome)
-        stmt.setString(2, candidato.email)
-        stmt.setString(3, candidato.cpf)
-        stmt.setInt   (4, candidato.idade)
-        stmt.setString(5, candidato.estado)
-        stmt.setString(6, candidato.cep)
-        stmt.setString(7, candidato.descricao)
-        stmt.setString(8, candidato.senha)
-        stmt.setInt   (9, candidato.id)
+        preencherParametrosCandidato(stmt, candidato)
+        stmt.setInt(9, candidato.id)
         stmt.executeUpdate()
 
-        stmt.close()
-        conn.close()
+        stmt.close(); conn.close()
     }
 
-    // Deleta candidato pelo id
     static void deletar(int id) {
         Connection conn = ConexaoBanco.obterConexao()
-
-        String sql = "DELETE FROM candidatos WHERE id = ?"
-        PreparedStatement stmt = conn.prepareStatement(sql)
+        PreparedStatement stmt = conn.prepareStatement("DELETE FROM candidatos WHERE id = ?")
         stmt.setInt(1, id)
         stmt.executeUpdate()
-
-        stmt.close()
-        conn.close()
+        stmt.close(); conn.close()
     }
 
-    // Busca as competências de um candidato (uso interno)
     static List<Competencia> buscarCompetenciasDoCandidato(Connection conn, int idCandidato) {
         List<Competencia> competencias = []
 
@@ -129,8 +84,41 @@ class CandidatoDAO {
             competencias.add(comp)
         }
 
-        rs.close()
-        stmt.close()
+        rs.close(); stmt.close()
         return competencias
+    }
+
+    private static Candidato mapearCandidato(ResultSet rs) {
+        Candidato c = new Candidato(
+                rs.getString("nome"),
+                rs.getString("email"),
+                rs.getString("cpf"),
+                rs.getInt("idade"),
+                rs.getString("estado"),
+                rs.getString("cep"),
+                rs.getString("descricao"),
+                [],
+                rs.getString("senha")
+        )
+        c.id = rs.getInt("id")
+        return c
+    }
+
+    private static void preencherParametrosCandidato(PreparedStatement stmt, Candidato candidato) {
+        stmt.setString(1, candidato.nome)
+        stmt.setString(2, candidato.email)
+        stmt.setString(3, candidato.cpf)
+        stmt.setInt   (4, candidato.idade)
+        stmt.setString(5, candidato.estado)
+        stmt.setString(6, candidato.cep)
+        stmt.setString(7, candidato.descricao)
+        stmt.setString(8, candidato.senha)
+    }
+
+    private static int extrairIdGerado(PreparedStatement stmt) {
+        ResultSet chaves = stmt.getGeneratedKeys()
+        int id = chaves.next() ? chaves.getInt(1) : 0
+        chaves.close()
+        return id
     }
 }

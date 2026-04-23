@@ -7,56 +7,44 @@ import linketinder.model.Vaga
 
 class MatchService {
 
-
-    private static Map<Integer, Set<Integer>> likesCandidatos = [:]
-
-
-    private static Map<Integer, Set<Integer>> likesEmpresas = [:]
-
+    private static Map<Integer, Set<Integer>> likesPorCandidato = [:]
+    private static Map<Integer, Set<Integer>> likesPorEmpresa   = [:]
     private static List<Match> matches = []
 
     static void registrarLikeCandidato(int idCandidato, int idVaga) {
-        if (!likesCandidatos[idCandidato]) likesCandidatos[idCandidato] = [] as Set
-        likesCandidatos[idCandidato].add(idVaga)
+        adicionarLike(likesPorCandidato, idCandidato, idVaga)
     }
 
     static void registrarLikeEmpresa(int idEmpresa, int idCandidato) {
-        if (!likesEmpresas[idEmpresa]) likesEmpresas[idEmpresa] = [] as Set
-        likesEmpresas[idEmpresa].add(idCandidato)
+        adicionarLike(likesPorEmpresa, idEmpresa, idCandidato)
     }
 
-    // Verifica match e armazena para todas as vagas curtidas da empresa
     static boolean houveMatch(int idCandidato, int idEmpresa) {
-        boolean empresaCurtiu = likesEmpresas[idEmpresa]?.contains(idCandidato) ?: false
-        if (!empresaCurtiu) return false
+        boolean empresaCurtiuCandidato = likesPorEmpresa[idEmpresa]?.contains(idCandidato) ?: false
+        if (!empresaCurtiuCandidato) return false
 
         Empresa empresa = EmpresaService.buscarPorId(idEmpresa)
         if (empresa == null) return false
 
-        Set<Integer> vagasCurtidas = likesCandidatos[idCandidato] ?: ([] as Set)
+        Set<Integer> vagasCurtidasPeloCandidato = likesPorCandidato[idCandidato] ?: ([] as Set)
+        List<Vaga> vagasEmComum = empresa.vagas.findAll { vaga -> vagasCurtidasPeloCandidato.contains(vaga.id) }
 
-        // Registra match para cada vaga da empresa que o candidato curtiu
-        List<Vaga> vagasComMatch = empresa.vagas.findAll { vaga -> vagasCurtidas.contains(vaga.id) }
-        if (vagasComMatch.isEmpty()) return false
+        if (vagasEmComum.isEmpty()) return false
 
-        vagasComMatch.each { vaga ->
-            boolean jaExiste = matches.any { it.idCandidato == idCandidato && it.idVaga == vaga.id }
-            if (!jaExiste) {
-                matches.add(new Match(idCandidato, vaga.id))
-            }
+        vagasEmComum.each { vaga ->
+            boolean matchJaRegistrado = matches.any { it.idCandidato == idCandidato && it.idVaga == vaga.id }
+            if (!matchJaRegistrado) matches.add(new Match(idCandidato, vaga.id))
         }
 
         return true
     }
 
-    // Retorna lista de maps com [vaga: Vaga, empresa: Empresa]
-    // Só inclui vagas que ainda existem
     static List<Map> obterMatchesCandidato(int idCandidato) {
         List<Map> resultado = []
 
         matches.findAll { it.idCandidato == idCandidato }.each { match ->
             Empresa empresa = EmpresaService.listar().find { e -> e.vagas.any { v -> v.id == match.idVaga } }
-            if (empresa == null) return  // Vaga excluída — match some
+            if (empresa == null) return
 
             Vaga vaga = empresa.vagas.find { v -> v.id == match.idVaga }
             if (vaga == null) return
@@ -67,8 +55,6 @@ class MatchService {
         return resultado
     }
 
-    // Retorna lista de maps com [vaga: Vaga, candidatos: List<Candidato>]
-    // Só considera vagas que ainda existem
     static List<Map> obterMatchesEmpresa(int idEmpresa) {
         List<Map> resultado = []
 
@@ -87,5 +73,10 @@ class MatchService {
         }
 
         return resultado
+    }
+
+    private static void adicionarLike(Map<Integer, Set<Integer>> mapa, int chave, int valor) {
+        if (!mapa[chave]) mapa[chave] = [] as Set
+        mapa[chave].add(valor)
     }
 }
