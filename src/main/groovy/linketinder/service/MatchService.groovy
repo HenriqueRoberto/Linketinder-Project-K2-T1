@@ -7,13 +7,12 @@ import linketinder.model.Vaga
 
 class MatchService {
 
-    // Likes do candidato em vagas: [idCandidato: Set<idVaga>]
+
     private static Map<Integer, Set<Integer>> likesCandidatos = [:]
 
-    // Likes da empresa em candidatos: [idEmpresa: Set<idCandidato>]
+
     private static Map<Integer, Set<Integer>> likesEmpresas = [:]
 
-    // Matches armazenados
     private static List<Match> matches = []
 
     static void registrarLikeCandidato(int idCandidato, int idVaga) {

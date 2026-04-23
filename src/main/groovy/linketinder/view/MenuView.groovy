@@ -37,7 +37,7 @@ class MenuView {
         print "Escolha uma opção: "
     }
 
-    // Submenu de competências da vaga (sem editar — substitui a vaga inteira no editarVaga)
+    // Submenu de competências da vaga
     static void menuCompetenciasVaga() {
         println "\n--- COMPETÊNCIAS DA VAGA ---"
         println "1 - Adicionar Competência"
