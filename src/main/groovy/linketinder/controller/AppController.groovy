@@ -2,25 +2,16 @@ package linketinder.controller
 
 import linketinder.service.*
 import linketinder.model.*
-import linketinder.model.Competencia
 import linketinder.view.MenuView
-import java.util.Scanner
-import linketinder.dao.CompetenciaDAO
 
 class AppController {
 
-    private static Scanner scanner = new Scanner(System.in)
-
-    // Armazena o objeto do usuário logado para persistência de sessão durante a execução
     private static Object usuarioLogado = null
 
     static void iniciar() {
         while (true) {
             MenuView.mostrarMenuInicial()
-            int opcao = scanner.nextInt()
-            scanner.nextLine()
-
-            switch (opcao) {
+            switch (MenuView.lerOpcao()) {
                 case 1: fluxoLogin(); break
                 case 2: fluxoCadastroCandidato(); break
                 case 3: fluxoCadastroEmpresa(); break
@@ -30,195 +21,103 @@ class AppController {
     }
 
     private static void fluxoLogin() {
-        println "\n--- LOGIN ---"
-        print "Email: "; String email = scanner.nextLine().trim()
-        print "Senha: "; String senha = scanner.nextLine().trim()
+        def credenciais = MenuView.lerCredenciaisLogin()
+        usuarioLogado = LoginService.realizarLogin(credenciais.email, credenciais.senha)
 
-        usuarioLogado = LoginService.realizarLogin(email, senha)
-
-        if (usuarioLogado != null) {
-            if (usuarioLogado instanceof Candidato) fluxoCandidato()
-            else if (usuarioLogado instanceof Empresa) fluxoEmpresa()
-        } else {
-            println "Erro: Credenciais invalidas."
-        }
+        if (usuarioLogado instanceof Candidato)  fluxoCandidato()
+        else if (usuarioLogado instanceof Empresa) fluxoEmpresa()
+        else MenuView.exibirMensagem("Erro: Credenciais inválidas.")
     }
 
-    // -------------------------
-    // FLUXO CANDIDATO
-    // -------------------------
+    // ---- FLUXO CANDIDATO ----
 
     private static void fluxoCandidato() {
         while (usuarioLogado != null) {
             MenuView.menuCandidato(usuarioLogado.nome)
-            int op = scanner.nextInt()
-            scanner.nextLine()
-
-            switch (op) {
+            switch (MenuView.lerOpcao()) {
                 case 1: MenuView.exibirPerfilLogado(usuarioLogado); break
                 case 2: editarDadosCandidato(); break
                 case 3: gerenciarCompetencias(usuarioLogado); break
                 case 4: explorarVagas(); break
-                case 5:
-                    def matches = MatchService.obterMatchesCandidato(usuarioLogado.id)
-                    MenuView.exibirMatchesCandidato(matches)
-                    break
-                case 0:
-                    usuarioLogado = null
-                    break
+                case 5: MenuView.exibirMatchesCandidato(MatchService.obterMatchesCandidato(usuarioLogado.id)); break
+                case 0: usuarioLogado = null; break
             }
-
         }
     }
 
     private static void editarDadosCandidato() {
-        println "\n--- EDITAR MEUS DADOS ---"
-        println "Deixe em branco para manter o valor atual."
-
-        print "Nome [" + usuarioLogado.nome + "]: "
-        String nome = scanner.nextLine().trim()
-
-        print "CPF [" + usuarioLogado.cpf + "]: "
-        String cpf = scanner.nextLine().trim()
-
-        print "Idade [" + usuarioLogado.idade + "]: "
-        String idadeStr = scanner.nextLine().trim()
-
-        print "Estado [" + usuarioLogado.estado + "]: "
-        String estado = scanner.nextLine().trim()
-
-        print "CEP [" + usuarioLogado.cep + "]: "
-        String cep = scanner.nextLine().trim()
-
-        print "Descrição [" + usuarioLogado.descricao + "]: "
-        String descricao = scanner.nextLine().trim()
-
-        print "Senha [****]: "
-        String senha = scanner.nextLine().trim()
-
-        if (!nome.isEmpty())      usuarioLogado.nome = nome
-        if (!cpf.isEmpty())       usuarioLogado.cpf = cpf
-        if (!idadeStr.isEmpty())  usuarioLogado.idade = idadeStr.toInteger()
-        if (!estado.isEmpty())    usuarioLogado.estado = estado
-        if (!cep.isEmpty())       usuarioLogado.cep = cep
-        if (!descricao.isEmpty()) usuarioLogado.descricao = descricao
-        if (!senha.isEmpty())     usuarioLogado.senha = senha
-
-        CandidatoService.atualizar(usuarioLogado)
-
-        println "Sucesso: Dados atualizados!"
+        def dados = MenuView.lerEdicaoCandidato(usuarioLogado as Candidato)
+        CandidatoService.aplicarEdicao(usuarioLogado as Candidato, dados)
+        MenuView.exibirMensagem("Sucesso: Dados atualizados!")
     }
-
 
     private static void gerenciarCompetencias(Candidato candidato) {
         while (true) {
-            List<Competencia> comps = candidato.competencias
-
             MenuView.menuCompetencias()
-            int op = scanner.nextInt()
-            scanner.nextLine()
-
-            switch (op) {
-                case 1:
-                    print "Nova competência: "
-                    String entrada = scanner.nextLine().trim()
-                    if (!entrada.isEmpty()) {
-                        int idComp = CompetenciaDAO.buscarOuInserir(entrada)
-                        CompetenciaDAO.vincularCandidato(candidato.id, idComp)
-                        Competencia nova = new Competencia(entrada)
-                        nova.id = idComp
-                        comps.add(nova)
-                        println "Sucesso: '" + entrada + "' adicionada!"
-                    }
-                    break
-                case 2:
-                    if (comps.isEmpty()) { println "Nenhuma competência para editar."; break }
-                    print "Número da competência para editar: "
-                    int numE = scanner.nextInt(); scanner.nextLine()
-                    int indiceE = numE - 1
-                    if (indiceE < 0 || indiceE >= comps.size()) { println "Erro: Número inválido."; break }
-                    print "Novo valor [" + comps[indiceE].nome + "]: "
-                    String novoValor = scanner.nextLine().trim()
-                    if (!novoValor.isEmpty()) {
-                        // Desvincula a antiga e vincula a nova
-                        CompetenciaDAO.desvincularCandidato(candidato.id, comps[indiceE].id)
-                        int idNovaComp = CompetenciaDAO.buscarOuInserir(novoValor)
-                        CompetenciaDAO.vincularCandidato(candidato.id, idNovaComp)
-                        comps[indiceE].nome = novoValor
-                        comps[indiceE].id = idNovaComp
-                        println "Sucesso: competência atualizada!"
-                    }
-                    break
-                case 3:
-                    if (comps.isEmpty()) { println "Nenhuma competência para excluir."; break }
-                    print "Número da competência para excluir: "
-                    int numX = scanner.nextInt(); scanner.nextLine()
-                    int indiceX = numX - 1
-                    if (indiceX < 0 || indiceX >= comps.size()) {
-                        println "Erro: Número inválido."
-                    } else {
-                        CompetenciaDAO.desvincularCandidato(candidato.id, comps[indiceX].id)
-                        String removida = comps.remove(indiceX).nome
-                        println "Sucesso: '" + removida + "' removida!"
-                    }
-                    break
-                case 4:
-                    println "\n--- SUAS COMPETÊNCIAS ---"
-                    if (comps.isEmpty()) {
-                        println "Nenhuma competência cadastrada."
-                    } else {
-                        comps.eachWithIndex { comp, i -> println "${i + 1}. ${comp.nome}" }
-                    }
-                    break
+            switch (MenuView.lerOpcao()) {
+                case 1: adicionarCompetencia(candidato); break
+                case 2: editarCompetencia(candidato); break
+                case 3: excluirCompetencia(candidato); break
+                case 4: MenuView.exibirCompetencias(candidato.competencias); break
                 case 0: return
             }
         }
     }
 
-    // Candidato explora vagas uma por uma com like/dislike
+    private static void adicionarCompetencia(Candidato candidato) {
+        String entrada = MenuView.lerNovaCompetencia()
+        if (entrada.isEmpty()) return
+        CompetenciaService.adicionarAoCandidato(candidato, entrada)
+        MenuView.exibirMensagem("Sucesso: '${entrada}' adicionada!")
+    }
+
+    private static void editarCompetencia(Candidato candidato) {
+        if (candidato.competencias.isEmpty()) { MenuView.exibirMensagem("Nenhuma competência para editar."); return }
+        int indice = MenuView.lerNumeroCompetencia()
+        if (indiceInvalido(indice, candidato.competencias.size())) return
+        String novoNome = MenuView.lerEdicaoCompetencia(candidato.competencias[indice].nome)
+        if (novoNome.isEmpty()) return
+        CompetenciaService.editarDoCandidato(candidato, indice, novoNome)
+        MenuView.exibirMensagem("Sucesso: competência atualizada!")
+    }
+
+    private static void excluirCompetencia(Candidato candidato) {
+        if (candidato.competencias.isEmpty()) { MenuView.exibirMensagem("Nenhuma competência para excluir."); return }
+        int indice = MenuView.lerNumeroCompetencia()
+        if (indiceInvalido(indice, candidato.competencias.size())) return
+        String removida = CompetenciaService.removerDoCandidato(candidato, indice)
+        MenuView.exibirMensagem("Sucesso: '${removida}' removida!")
+    }
+
     private static void explorarVagas() {
         List<Vaga> vagas = EmpresaService.listarTodasVagas()
-
-        if (vagas.isEmpty()) {
-            println "\nNenhuma vaga disponível no momento."
-            return
-        }
+        if (vagas.isEmpty()) { MenuView.exibirMensagem("\nNenhuma vaga disponível no momento."); return }
 
         for (vaga in vagas) {
             MenuView.exibirVaga(vaga)
-            MenuView.interagirOpcoes()
-            String acao = scanner.nextLine().toUpperCase()
+            MenuView.exibirOpcoesDeCurtir()
+            String acao = MenuView.lerAcaoSwipe()
 
             if (acao == "L") {
-                // Registra o like pelo id único da vaga — sem depender de índice
                 MatchService.registrarLikeCandidato(usuarioLogado.id, vaga.id)
-
                 Empresa empresa = EmpresaService.buscarPorId(vaga.idEmpresa)
                 if (empresa && MatchService.houveMatch(usuarioLogado.id, empresa.id)) {
-                    println "MATCH com a empresa " + empresa.nome + "!"
+                    MenuView.exibirMensagem("MATCH com a empresa ${empresa.nome}!")
                 }
             } else if (acao == "S") break
         }
     }
 
-    // -------------------------
-    // FLUXO EMPRESA
-    // -------------------------
+    // ---- FLUXO EMPRESA ----
 
     private static void fluxoEmpresa() {
         while (usuarioLogado != null) {
             MenuView.menuEmpresa(usuarioLogado.nome)
-            int op = scanner.nextInt()
-            scanner.nextLine()
-
-            switch (op) {
+            switch (MenuView.lerOpcao()) {
                 case 1: MenuView.exibirPerfilLogado(usuarioLogado); break
                 case 2: editarDadosEmpresa(); break
                 case 3: explorarCandidatos(); break
-                case 4:
-                    def matches = MatchService.obterMatchesEmpresa(usuarioLogado.id)
-                    MenuView.exibirMatchesEmpresa(matches)
-                    break
+                case 4: MenuView.exibirMatchesEmpresa(MatchService.obterMatchesEmpresa(usuarioLogado.id)); break
                 case 5: fluxoGerenciarVagas(); break
                 case 0: usuarioLogado = null; break
             }
@@ -226,54 +125,21 @@ class AppController {
     }
 
     private static void editarDadosEmpresa() {
-        println "\n--- EDITAR MEUS DADOS ---"
-        println "Deixe em branco para manter o valor atual."
-
-        print "Nome [" + usuarioLogado.nome + "]: "
-        String nome = scanner.nextLine().trim()
-
-        print "CNPJ [" + usuarioLogado.cnpj + "]: "
-        String cnpj = scanner.nextLine().trim()
-
-        print "País [" + usuarioLogado.pais + "]: "
-        String pais = scanner.nextLine().trim()
-
-        print "Estado [" + usuarioLogado.estado + "]: "
-        String estado = scanner.nextLine().trim()
-
-        print "CEP [" + usuarioLogado.cep + "]: "
-        String cep = scanner.nextLine().trim()
-
-        print "Descrição [" + usuarioLogado.descricao + "]: "
-        String descricao = scanner.nextLine().trim()
-
-        print "Senha [****]: "
-        String senha = scanner.nextLine().trim()
-
-        if (!nome.isEmpty())      usuarioLogado.nome = nome
-        if (!cnpj.isEmpty())      usuarioLogado.cnpj = cnpj
-        if (!pais.isEmpty())      usuarioLogado.pais = pais
-        if (!estado.isEmpty())    usuarioLogado.estado = estado
-        if (!cep.isEmpty())       usuarioLogado.cep = cep
-        if (!descricao.isEmpty()) usuarioLogado.descricao = descricao
-        if (!senha.isEmpty())     usuarioLogado.senha = senha
-
-        EmpresaService.atualizar(usuarioLogado)
-
-        println "Sucesso: Dados atualizados!"
+        def dados = MenuView.lerEdicaoEmpresa(usuarioLogado as Empresa)
+        EmpresaService.aplicarEdicao(usuarioLogado as Empresa, dados)
+        MenuView.exibirMensagem("Sucesso: Dados atualizados!")
     }
 
     private static void explorarCandidatos() {
         for (candidato in CandidatoService.listar()) {
-            // Exibe dados restritos: sem nome, CPF, idade e email
             MenuView.exibirCandidatoRestrito(candidato)
-            MenuView.interagirOpcoes()
-            String acao = scanner.nextLine().toUpperCase()
+            MenuView.exibirOpcoesDeCurtir()
+            String acao = MenuView.lerAcaoSwipe()
 
             if (acao == "L") {
                 MatchService.registrarLikeEmpresa(usuarioLogado.id, candidato.id)
                 if (MatchService.houveMatch(candidato.id, usuarioLogado.id)) {
-                    println "MATCH!"
+                    MenuView.exibirMensagem("MATCH!")
                 }
             } else if (acao == "S") break
         }
@@ -282,10 +148,7 @@ class AppController {
     private static void fluxoGerenciarVagas() {
         while (true) {
             MenuView.menuGerenciarVagas()
-            int op = scanner.nextInt()
-            scanner.nextLine()
-
-            switch (op) {
+            switch (MenuView.lerOpcao()) {
                 case 1: criarVaga(); break
                 case 2: editarVaga(); break
                 case 3: excluirVaga(); break
@@ -296,123 +159,74 @@ class AppController {
     }
 
     private static void criarVaga() {
-        println "\n--- NOVA VAGA ---"
-        print "Nome: "; String nome = scanner.nextLine().trim()
-        print "Descrição: "; String desc = scanner.nextLine().trim()
-        print "Horário: "; String horario = scanner.nextLine().trim()
-        print "Localização: "; String local = scanner.nextLine().trim()
-        print "Remuneração: "; String remun = scanner.nextLine().trim()
-
-        if (nome.isEmpty() || desc.isEmpty() || horario.isEmpty() || local.isEmpty() || remun.isEmpty()) {
-            println "Erro: Todos os campos são obrigatórios."
+        def dados = MenuView.lerDadosNovaVaga()
+        if ([dados.nome, dados.descricao, dados.horario, dados.localizacao, dados.remuneracao].any { it.isEmpty() }) {
+            MenuView.exibirMensagem("Erro: Todos os campos são obrigatórios.")
             return
         }
 
-        // Empresa gerencia competências dentro da vaga
         List<Competencia> competencias = []
         gerenciarCompetenciasVaga(competencias)
 
-        Vaga nova = new Vaga(nome, desc, horario, local, remun, competencias, usuarioLogado.id)
-
         try {
-            EmpresaService.criarVaga(usuarioLogado.id, nova)
-            println "Sucesso: Vaga criada!"
+            EmpresaService.criarVaga(usuarioLogado.id, new Vaga(dados.nome, dados.descricao, dados.horario, dados.localizacao, dados.remuneracao, competencias, usuarioLogado.id))
+            MenuView.exibirMensagem("Sucesso: Vaga criada!")
         } catch (IllegalArgumentException e) {
-            println "Erro: " + e.getMessage()
+            MenuView.exibirMensagem("Erro: ${e.message}")
         }
     }
 
     private static void editarVaga() {
         List<Vaga> vagas = EmpresaService.listarVagasDaEmpresa(usuarioLogado.id)
+        if (vagas.isEmpty()) { MenuView.exibirMensagem("\nVocê não possui vagas cadastradas."); return }
 
-        if (vagas.isEmpty()) {
-            println "\nVocê não possui vagas cadastradas."
-            return
-        }
-
-        println "\n--- SUAS VAGAS ---"
-        vagas.eachWithIndex { v, i -> println "${i + 1}. ${v.nome} | ${v.localizacao}" }
-
-        print "Número da vaga para editar: "
-        int num = scanner.nextInt()
-        scanner.nextLine()
-        int indice = num - 1
-
-        if (indice < 0 || indice >= vagas.size()) {
-            println "Erro: Número inválido."
-            return
-        }
+        MenuView.exibirListaDeVagas(vagas)
+        int indice = MenuView.lerNumeroVaga()
+        if (indiceInvalido(indice, vagas.size())) return
 
         Vaga vaga = vagas[indice]
-        println "\n--- EDITANDO: " + vaga.nome + " ---"
-        println "Deixe em branco para manter o valor atual."
+        def dados = MenuView.lerEdicaoVaga(vaga)
 
-        print "Nome [" + vaga.nome + "]: "; String nome = scanner.nextLine().trim()
-        print "Descrição [" + vaga.descricao + "]: "; String desc = scanner.nextLine().trim()
-        print "Horário [" + vaga.horario + "]: "; String horario = scanner.nextLine().trim()
-        print "Localização [" + vaga.localizacao + "]: "; String local = scanner.nextLine().trim()
-        print "Remuneração [" + vaga.remuneracao + "]: "; String remun = scanner.nextLine().trim()
-
-        // Mantém o valor atual se deixado em branco
-        String novoNome    = nome.isEmpty()    ? vaga.nome        : nome
-        String novaDesc    = desc.isEmpty()    ? vaga.descricao   : desc
-        String novoHorario = horario.isEmpty() ? vaga.horario     : horario
-        String novoLocal   = local.isEmpty()   ? vaga.localizacao : local
-        String novoRemun   = remun.isEmpty()   ? vaga.remuneracao : remun
-
-        // Mantém as competências existentes e permite gerenciá-las dentro da vaga
         List<Competencia> competencias = new ArrayList<>(vaga.competencias)
         gerenciarCompetenciasVaga(competencias)
 
-        Vaga atualizada = new Vaga(novoNome, novaDesc, novoHorario, novoLocal, novoRemun, competencias, usuarioLogado.id)
-
         try {
+            Vaga atualizada = new Vaga(
+                    dados.nome        ?: vaga.nome,
+                    dados.descricao   ?: vaga.descricao,
+                    dados.horario     ?: vaga.horario,
+                    dados.localizacao ?: vaga.localizacao,
+                    dados.remuneracao ?: vaga.remuneracao,
+                    competencias,
+                    usuarioLogado.id
+            )
             EmpresaService.editarVaga(usuarioLogado.id, indice, atualizada)
-            println "Sucesso: Vaga atualizada!"
+            MenuView.exibirMensagem("Sucesso: Vaga atualizada!")
         } catch (IllegalArgumentException e) {
-            println "Erro: " + e.getMessage()
+            MenuView.exibirMensagem("Erro: ${e.message}")
         }
     }
 
-    // Empresa gerencia competências dentro de uma vaga (adicionar, excluir, listar)
     private static void gerenciarCompetenciasVaga(List<Competencia> competencias) {
         while (true) {
             MenuView.menuCompetenciasVaga()
-            int op = scanner.nextInt()
-            scanner.nextLine()
-
-            switch (op) {
+            switch (MenuView.lerOpcao()) {
                 case 1:
-                    print "Nova competência: "
-                    String entrada = scanner.nextLine().trim()
+                    String entrada = MenuView.lerNovaCompetencia()
                     if (!entrada.isEmpty()) {
                         competencias.add(new Competencia(entrada))
-                        println "Sucesso: '" + entrada + "' adicionada!"
+                        MenuView.exibirMensagem("Sucesso: '${entrada}' adicionada!")
                     }
                     break
                 case 2:
-                    if (competencias.isEmpty()) {
-                        println "Nenhuma competência para excluir."
-                        break
-                    }
-                    print "Número da competência para excluir: "
-                    int num = scanner.nextInt()
-                    scanner.nextLine()
-                    int idx = num - 1
-                    if (idx < 0 || idx >= competencias.size()) {
-                        println "Erro: Número inválido."
-                    } else {
-                        String removida = competencias.remove(idx).nome
-                        println "Sucesso: '" + removida + "' removida!"
+                    if (competencias.isEmpty()) { MenuView.exibirMensagem("Nenhuma competência para excluir."); break }
+                    int indice = MenuView.lerNumeroCompetencia()
+                    if (!indiceInvalido(indice, competencias.size())) {
+                        MenuView.exibirMensagem("Sucesso: '${competencias.remove(indice).nome}' removida!")
                     }
                     break
                 case 3:
-                    println "\n--- COMPETÊNCIAS DA VAGA ---"
-                    if (competencias.isEmpty()) {
-                        println "Nenhuma competência cadastrada."
-                    } else {
-                        competencias.eachWithIndex { comp, i -> println "${i + 1}. ${comp.nome}" }
-                    }
+                    MenuView.exibirCompetencias(competencias)
                     break
                 case 0: return
             }
@@ -421,97 +235,61 @@ class AppController {
 
     private static void excluirVaga() {
         List<Vaga> vagas = EmpresaService.listarVagasDaEmpresa(usuarioLogado.id)
+        if (vagas.isEmpty()) { MenuView.exibirMensagem("\nVocê não possui vagas cadastradas."); return }
 
-        if (vagas.isEmpty()) {
-            println "\nVocê não possui vagas cadastradas."
-            return
-        }
-
-        println "\n--- SUAS VAGAS ---"
-        vagas.eachWithIndex { v, i -> println "${i + 1}. ${v.nome} | ${v.localizacao}" }
-
-        print "Número da vaga para excluir: "
-        int num = scanner.nextInt()
-        scanner.nextLine()
-        int indice = num - 1
+        MenuView.exibirListaDeVagas(vagas)
+        int indice = MenuView.lerNumeroVaga()
 
         try {
             EmpresaService.excluirVaga(usuarioLogado.id, indice)
-            println "Sucesso: Vaga excluída!"
+            MenuView.exibirMensagem("Sucesso: Vaga excluída!")
         } catch (IllegalArgumentException e) {
-            println "Erro: " + e.getMessage()
+            MenuView.exibirMensagem("Erro: ${e.message}")
         }
     }
 
     private static void listarVagasDaEmpresa() {
         List<Vaga> vagas = EmpresaService.listarVagasDaEmpresa(usuarioLogado.id)
-
-        println "\n--- SUAS VAGAS ---"
-        if (vagas.isEmpty()) {
-            println "Nenhuma vaga cadastrada."
-            return
-        }
-
-        vagas.eachWithIndex { v, i ->
-            println "\n[" + (i + 1) + "]"
-            println v.toString()
-        }
+        MenuView.exibirMensagem("\n--- SUAS VAGAS ---")
+        if (vagas.isEmpty()) { MenuView.exibirMensagem("Nenhuma vaga cadastrada."); return }
+        vagas.eachWithIndex { v, i -> MenuView.exibirMensagem("\n[${i + 1}]\n${v}") }
     }
 
-    // -------------------------
-    // CADASTRO
-    // -------------------------
-
     private static void fluxoCadastroCandidato() {
-        println "\n--- NOVO CANDIDATO ---"
-        print "Nome: "; String nome = scanner.nextLine().trim()
-        print "Email: "; String email = scanner.nextLine().trim()
-        print "CPF: "; String cpf = scanner.nextLine().trim()
-        print "Idade: "; int idade = scanner.nextInt(); scanner.nextLine()
-        print "Estado: "; String estado = scanner.nextLine().trim()
-        print "CEP: "; String cep = scanner.nextLine().trim()
-        print "Senha: "; String senha = scanner.nextLine().trim()
-        print "Descrição: "; String desc = scanner.nextLine().trim()
-
-        if (nome.isEmpty() || email.isEmpty() || cpf.isEmpty() || estado.isEmpty() || cep.isEmpty() || senha.isEmpty() || desc.isEmpty()) {
-            println "Erro: Todos os campos são obrigatórios."
+        def dados = MenuView.lerDadosCadastroCandidato()
+        if ([dados.nome, dados.email, dados.cpf, dados.estado, dados.cep, dados.senha, dados.descricao].any { it.toString().isEmpty() }) {
+            MenuView.exibirMensagem("Erro: Todos os campos são obrigatórios.")
             return
         }
-
         try {
-            Candidato novo = new Candidato(nome, email, cpf, idade, estado, cep, desc, [], senha)
+            Candidato novo = new Candidato(dados.nome, dados.email, dados.cpf, dados.idade as int, dados.estado, dados.cep, dados.descricao, [], dados.senha)
             CandidatoService.cadastrar(novo)
-
             gerenciarCompetencias(novo)
-
-            println "Sucesso: Cadastrado com sucesso!"
+            MenuView.exibirMensagem("Sucesso: Cadastrado com sucesso!")
         } catch (IllegalArgumentException e) {
-            println "Erro: " + e.getMessage()
+            MenuView.exibirMensagem("Erro: ${e.message}")
         }
     }
 
     private static void fluxoCadastroEmpresa() {
-        println "\n--- NOVA EMPRESA ---"
-        print "Nome: "; String nome = scanner.nextLine().trim()
-        print "Email: "; String email = scanner.nextLine().trim()
-        print "CNPJ: "; String cnpj = scanner.nextLine().trim()
-        print "País: "; String pais = scanner.nextLine().trim()
-        print "Estado: "; String estado = scanner.nextLine().trim()
-        print "CEP: "; String cep = scanner.nextLine().trim()
-        print "Senha: "; String senha = scanner.nextLine().trim()
-        print "Descrição: "; String desc = scanner.nextLine().trim()
-
-        if (nome.isEmpty() || email.isEmpty() || cnpj.isEmpty() || pais.isEmpty() || estado.isEmpty() || cep.isEmpty() || senha.isEmpty() || desc.isEmpty()) {
-            println "Erro: Todos os campos são obrigatórios."
+        def dados = MenuView.lerDadosCadastroEmpresa()
+        if ([dados.nome, dados.email, dados.cnpj, dados.pais, dados.estado, dados.cep, dados.senha, dados.descricao].any { it.isEmpty() }) {
+            MenuView.exibirMensagem("Erro: Todos os campos são obrigatórios.")
             return
         }
-
         try {
-            Empresa nova = new Empresa(nome, email, cnpj, pais, estado, cep, desc, senha)
-            EmpresaService.cadastrar(nova)
-            println "Sucesso: Cadastrada com sucesso!"
+            EmpresaService.cadastrar(new Empresa(dados.nome, dados.email, dados.cnpj, dados.pais, dados.estado, dados.cep, dados.descricao, dados.senha))
+            MenuView.exibirMensagem("Sucesso: Cadastrada com sucesso!")
         } catch (IllegalArgumentException e) {
-            println "Erro: " + e.getMessage()
+            MenuView.exibirMensagem("Erro: ${e.message}")
         }
+    }
+
+    private static boolean indiceInvalido(int indice, int tamanho) {
+        if (indice < 0 || indice >= tamanho) {
+            MenuView.exibirMensagem("Erro: Número inválido.")
+            return true
+        }
+        return false
     }
 }

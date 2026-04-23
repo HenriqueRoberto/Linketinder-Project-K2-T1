@@ -4,7 +4,10 @@ import linketinder.model.*
 
 class MenuView {
 
-    // Exibe as opções iniciais do sistema para usuários não autenticados
+    private static Scanner scanner = new Scanner(System.in)
+
+    // ---- MENUS ----
+
     static void mostrarMenuInicial() {
         println "\n=== LINKETINDER ==="
         println "1 - Login"
@@ -14,9 +17,8 @@ class MenuView {
         print "Escolha uma opção: "
     }
 
-    // Menu restrito a candidatos após o login bem-sucedido
     static void menuCandidato(String nome) {
-        println "\n--- MENU CANDIDATO: " + nome + " ---"
+        println "\n--- MENU CANDIDATO: ${nome} ---"
         println "1 - Ver Meus Dados"
         println "2 - Editar Meus Dados"
         println "3 - Gerenciar Competências"
@@ -26,7 +28,6 @@ class MenuView {
         print "Escolha uma opção: "
     }
 
-    // Submenu de competências do candidato (CRUD completo)
     static void menuCompetencias() {
         println "\n--- COMPETÊNCIAS ---"
         println "1 - Adicionar Competência"
@@ -37,7 +38,6 @@ class MenuView {
         print "Escolha uma opção: "
     }
 
-    // Submenu de competências da vaga
     static void menuCompetenciasVaga() {
         println "\n--- COMPETÊNCIAS DA VAGA ---"
         println "1 - Adicionar Competência"
@@ -47,9 +47,8 @@ class MenuView {
         print "Escolha uma opção: "
     }
 
-    // Menu restrito a empresas após o login bem-sucedido
     static void menuEmpresa(String nome) {
-        println "\n--- MENU EMPRESA: " + nome + " ---"
+        println "\n--- MENU EMPRESA: ${nome} ---"
         println "1 - Ver Meus Dados"
         println "2 - Editar Meus Dados"
         println "3 - Explorar Candidatos"
@@ -59,7 +58,6 @@ class MenuView {
         print "Escolha uma opção: "
     }
 
-    // Submenu de gerenciamento de vagas da empresa
     static void menuGerenciarVagas() {
         println "\n--- GERENCIAR VAGAS ---"
         println "1 - Criar Vaga"
@@ -70,94 +68,228 @@ class MenuView {
         print "Escolha uma opção: "
     }
 
-    // Utiliza o toString() sobrescrito no model para exibir as informações do perfil
+    // ---- LEITURA DE OPÇÕES ----
+
+    static int lerOpcao() {
+        int op = scanner.nextInt()
+        scanner.nextLine()
+        return op
+    }
+
+    // ---- LEITURA DE DADOS ----
+
+    static Map<String, String> lerCredenciaisLogin() {
+        println "\n--- LOGIN ---"
+        print "Email: "; String email = scanner.nextLine().trim()
+        print "Senha: "; String senha = scanner.nextLine().trim()
+        return [email: email, senha: senha]
+    }
+
+    static Map<String, Object> lerDadosCadastroCandidato() {
+        println "\n--- NOVO CANDIDATO ---"
+        print "Nome: ";      String nome   = scanner.nextLine().trim()
+        print "Email: ";     String email  = scanner.nextLine().trim()
+        print "CPF: ";       String cpf    = scanner.nextLine().trim()
+        print "Idade: ";     int    idade  = scanner.nextInt(); scanner.nextLine()
+        print "Estado: ";    String estado = scanner.nextLine().trim()
+        print "CEP: ";       String cep    = scanner.nextLine().trim()
+        print "Senha: ";     String senha  = scanner.nextLine().trim()
+        print "Descrição: "; String desc   = scanner.nextLine().trim()
+        return [nome: nome, email: email, cpf: cpf, idade: idade, estado: estado, cep: cep, senha: senha, descricao: desc]
+    }
+
+    static Map<String, String> lerDadosCadastroEmpresa() {
+        println "\n--- NOVA EMPRESA ---"
+        print "Nome: ";      String nome   = scanner.nextLine().trim()
+        print "Email: ";     String email  = scanner.nextLine().trim()
+        print "CNPJ: ";      String cnpj   = scanner.nextLine().trim()
+        print "País: ";      String pais   = scanner.nextLine().trim()
+        print "Estado: ";    String estado = scanner.nextLine().trim()
+        print "CEP: ";       String cep    = scanner.nextLine().trim()
+        print "Senha: ";     String senha  = scanner.nextLine().trim()
+        print "Descrição: "; String desc   = scanner.nextLine().trim()
+        return [nome: nome, email: email, cnpj: cnpj, pais: pais, estado: estado, cep: cep, senha: senha, descricao: desc]
+    }
+
+    static Map<String, String> lerEdicaoCandidato(Candidato candidato) {
+        println "\n--- EDITAR MEUS DADOS ---"
+        println "Deixe em branco para manter o valor atual."
+        return [
+                nome:      lerCampoOpcional("Nome",      candidato.nome),
+                cpf:       lerCampoOpcional("CPF",       candidato.cpf),
+                idade:     lerCampoOpcional("Idade",     String.valueOf(candidato.idade)),
+                estado:    lerCampoOpcional("Estado",    candidato.estado),
+                cep:       lerCampoOpcional("CEP",       candidato.cep),
+                descricao: lerCampoOpcional("Descrição", candidato.descricao),
+                senha:     lerCampoSenhaOpcional()
+        ]
+    }
+
+    static Map<String, String> lerEdicaoEmpresa(Empresa empresa) {
+        println "\n--- EDITAR MEUS DADOS ---"
+        println "Deixe em branco para manter o valor atual."
+        return [
+                nome:      lerCampoOpcional("Nome",      empresa.nome),
+                cnpj:      lerCampoOpcional("CNPJ",      empresa.cnpj),
+                pais:      lerCampoOpcional("País",      empresa.pais),
+                estado:    lerCampoOpcional("Estado",    empresa.estado),
+                cep:       lerCampoOpcional("CEP",       empresa.cep),
+                descricao: lerCampoOpcional("Descrição", empresa.descricao),
+                senha:     lerCampoSenhaOpcional()
+        ]
+    }
+
+    static Map<String, String> lerEdicaoVaga(Vaga vaga) {
+        println "\n--- EDITANDO: ${vaga.nome} ---"
+        println "Deixe em branco para manter o valor atual."
+        return [
+                nome:        lerCampoOpcional("Nome",        vaga.nome),
+                descricao:   lerCampoOpcional("Descrição",   vaga.descricao),
+                horario:     lerCampoOpcional("Horário",     vaga.horario),
+                localizacao: lerCampoOpcional("Localização", vaga.localizacao),
+                remuneracao: lerCampoOpcional("Remuneração", vaga.remuneracao)
+        ]
+    }
+
+    static Map<String, String> lerDadosNovaVaga() {
+        println "\n--- NOVA VAGA ---"
+        print "Nome: ";        String nome    = scanner.nextLine().trim()
+        print "Descrição: ";   String desc    = scanner.nextLine().trim()
+        print "Horário: ";     String horario = scanner.nextLine().trim()
+        print "Localização: "; String local   = scanner.nextLine().trim()
+        print "Remuneração: "; String remun   = scanner.nextLine().trim()
+        return [nome: nome, descricao: desc, horario: horario, localizacao: local, remuneracao: remun]
+    }
+
+    static String lerNovaCompetencia() {
+        print "Nova competência: "
+        return scanner.nextLine().trim()
+    }
+
+    static int lerNumeroCompetencia() {
+        print "Número da competência: "
+        int num = scanner.nextInt()
+        scanner.nextLine()
+        return num - 1
+    }
+
+    static String lerEdicaoCompetencia(String nomeAtual) {
+        print "Novo valor [${nomeAtual}]: "
+        return scanner.nextLine().trim()
+    }
+
+    static String lerAcaoSwipe() {
+        return scanner.nextLine().toUpperCase()
+    }
+
+    static int lerNumeroVaga() {
+        int num = scanner.nextInt()
+        scanner.nextLine()
+        return num - 1
+    }
+
+    // ---- EXIBIÇÃO ----
+
     static void exibirPerfilLogado(Object usuario) {
         println "\n--- SEU PERFIL ---"
         println usuario.toString()
     }
 
-    // Padroniza as opções de interação durante a navegação entre perfis
-    static void interagirOpcoes() {
+    static void exibirOpcoesDeCurtir() {
         print "\n[L] Curtir | [P] Próximo | [S] Sair: "
     }
 
-    // Exibe uma vaga formatada (candidato explorando vagas)
     static void exibirVaga(Vaga vaga) {
         println "\n------------------------"
         println vaga.toString()
     }
 
-    // Exibe dados restritos do candidato para a empresa (sem nome, CPF, idade e email)
+    static void exibirListaDeVagas(List<Vaga> vagas) {
+        println "\n--- SUAS VAGAS ---"
+        vagas.eachWithIndex { v, i -> println "${i + 1}. ${v.nome} | ${v.localizacao}" }
+    }
+
+    static void exibirCompetencias(List<Competencia> competencias) {
+        println "\n--- COMPETÊNCIAS ---"
+        if (competencias.isEmpty()) {
+            println "Nenhuma competência cadastrada."
+        } else {
+            competencias.eachWithIndex { comp, i -> println "${i + 1}. ${comp.nome}" }
+        }
+    }
+
     static void exibirCandidatoRestrito(Candidato candidato) {
         println "\n------------------------"
-        String compTexto = (candidato.competencias == null || candidato.competencias.isEmpty()) ?
-                "sem competências cadastradas" : candidato.competencias.collect { it.nome }.join(", ")
-
-        println "Descrição: " + (candidato.descricao ?: "Sem descrição")
-        println "Competências: " + compTexto
-        println "Estado: " + candidato.estado
-        println "CEP: " + candidato.cep
+        println "Descrição: ${candidato.descricao ?: 'Sem descrição'}"
+        println "Competências: ${formatarCompetencias(candidato.competencias)}"
+        println "Estado: ${candidato.estado}"
+        println "CEP: ${candidato.cep}"
     }
 
-    // Exibe dados completos do candidato (usado na tela de match da empresa)
-    static void exibirCandidatoCompleto(Candidato candidato) {
-        String compTexto = (candidato.competencias == null || candidato.competencias.isEmpty()) ?
-                "sem competências cadastradas" : candidato.competencias.collect { it.nome }.join(", ")
-
-        println "\n  Nome: " + candidato.nome
-        println "  CPF: " + candidato.cpf
-        println "  Idade: " + candidato.idade
-        println "  Estado: " + candidato.estado
-        println "  CEP: " + candidato.cep
-        println "  Descrição: " + (candidato.descricao ?: "Sem descrição")
-        println "  Competências: " + compTexto
-    }
-
-    // Exibe os matches do candidato: vaga + empresa
     static void exibirMatchesCandidato(List<Map> matches) {
         println "\n--- SEUS MATCHES ---"
-        if (matches.isEmpty()) {
-            println "Nenhum match encontrado até o momento."
-            return
-        }
+        if (matches.isEmpty()) { println "Nenhum match encontrado até o momento."; return }
 
         matches.each { m ->
             Vaga vaga = m.vaga
             Empresa empresa = m.empresa
-
             println "\n============================"
             println "[ VAGA ]"
             println vaga.toString()
             println "\n[ EMPRESA ]"
-            println "Nome: " + empresa.nome
-            println "Email: " + empresa.email
-            println "CNPJ: " + empresa.cnpj
-            println "Descrição: " + (empresa.descricao ?: "Sem descrição")
-            println "País: " + empresa.pais
-            println "Estado: " + empresa.estado
-            println "CEP: " + empresa.cep
+            println "Nome: ${empresa.nome}"
+            println "Email: ${empresa.email}"
+            println "CNPJ: ${empresa.cnpj}"
+            println "Descrição: ${empresa.descricao ?: 'Sem descrição'}"
+            println "País: ${empresa.pais}"
+            println "Estado: ${empresa.estado}"
+            println "CEP: ${empresa.cep}"
         }
     }
 
-    // Exibe os matches da empresa: vagas e seus candidatos
     static void exibirMatchesEmpresa(List<Map> matches) {
         println "\n--- SEUS MATCHES ---"
-        if (matches.isEmpty()) {
-            println "Nenhum match encontrado até o momento."
-            return
-        }
+        if (matches.isEmpty()) { println "Nenhum match encontrado até o momento."; return }
 
         matches.each { m ->
-            Vaga vaga = m.vaga
-            List<Candidato> candidatos = m.candidatos
-
             println "\n============================"
-            println "[ VAGA ] " + vaga.descricao
+            println "[ VAGA ] ${m.vaga.descricao}"
             println "Candidatos com match:"
-            candidatos.each { c ->
+            (m.candidatos as List<Candidato>).each { c ->
                 println "---"
                 exibirCandidatoCompleto(c)
             }
         }
+    }
+
+    static void exibirMensagem(String mensagem) {
+        println mensagem
+    }
+
+    // ---- HELPERS PRIVADOS ----
+
+    private static void exibirCandidatoCompleto(Candidato candidato) {
+        println "\n  Nome: ${candidato.nome}"
+        println "  CPF: ${candidato.cpf}"
+        println "  Idade: ${candidato.idade}"
+        println "  Estado: ${candidato.estado}"
+        println "  CEP: ${candidato.cep}"
+        println "  Descrição: ${candidato.descricao ?: 'Sem descrição'}"
+        println "  Competências: ${formatarCompetencias(candidato.competencias)}"
+    }
+
+    private static String formatarCompetencias(List<Competencia> competencias) {
+        if (!competencias) return "sem competências cadastradas"
+        return competencias.collect { it.nome }.join(", ")
+    }
+
+    private static String lerCampoOpcional(String label, String valorAtual) {
+        print "${label} [${valorAtual}]: "
+        return scanner.nextLine().trim()
+    }
+
+    private static String lerCampoSenhaOpcional() {
+        print "Senha [****]: "
+        return scanner.nextLine().trim()
     }
 }

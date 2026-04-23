@@ -84,4 +84,16 @@ class EmpresaService {
 
         VagaDAO.deletar(vagas[indice].id)
     }
+
+    static void aplicarEdicao(Empresa empresa, Map<String, String> dados) {
+        if (!dados.nome.isEmpty())      empresa.nome      = dados.nome
+        if (!dados.cnpj.isEmpty())      empresa.cnpj      = dados.cnpj
+        if (!dados.pais.isEmpty())      empresa.pais      = dados.pais
+        if (!dados.estado.isEmpty())    empresa.estado    = dados.estado
+        if (!dados.cep.isEmpty())       empresa.cep       = dados.cep
+        if (!dados.descricao.isEmpty()) empresa.descricao = dados.descricao
+        if (!dados.senha.isEmpty())     empresa.senha     = dados.senha
+        EmpresaDAO.atualizar(empresa)
+    }
 }
+
