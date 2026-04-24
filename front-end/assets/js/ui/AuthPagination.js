@@ -1,56 +1,49 @@
 "use strict";
-class FormController {
+class AlternadorDeFormularios {
     constructor() {
-        this.login = this.getElement("form-login");
-        this.empresa = this.getElement("form-empresa");
-        this.candidato = this.getElement("form-candidato");
+        this.formLogin = this.obterElemento("form-login");
+        this.formEmpresa = this.obterElemento("form-empresa");
+        this.formCandidato = this.obterElemento("form-candidato");
     }
-    getElement(id) {
-        const element = document.getElementById(id);
-        if (!element) {
+    exibir(tipo) {
+        this.ocultarTodos();
+        if (tipo === "login")
+            this.formLogin.classList.remove("hidden");
+        if (tipo === "empresa")
+            this.formEmpresa.classList.remove("hidden");
+        if (tipo === "candidato")
+            this.formCandidato.classList.remove("hidden");
+    }
+    ocultarTodos() {
+        this.formLogin.classList.add("hidden");
+        this.formEmpresa.classList.add("hidden");
+        this.formCandidato.classList.add("hidden");
+    }
+    obterElemento(id) {
+        const elemento = document.getElementById(id);
+        if (!elemento)
             throw new Error(`Elemento #${id} não encontrado`);
-        }
-        return element;
-    }
-    show(type) {
-        this.hideAll();
-        if (type === "login")
-            this.login.classList.remove("hidden");
-        if (type === "empresa")
-            this.empresa.classList.remove("hidden");
-        if (type === "candidato")
-            this.candidato.classList.remove("hidden");
-    }
-    hideAll() {
-        this.login.classList.add("hidden");
-        this.empresa.classList.add("hidden");
-        this.candidato.classList.add("hidden");
+        return elemento;
     }
 }
 document.addEventListener("DOMContentLoaded", () => {
-    const controller = new FormController();
+    const alternador = new AlternadorDeFormularios();
     const linkEmpresa = document.getElementById("link-empresa");
     const linkCandidato = document.getElementById("link-candidato");
-    const backEmpresa = document.getElementById("back-login-empresa");
-    const backCandidato = document.getElementById("back-login-candidato");
-    if (!linkEmpresa || !linkCandidato || !backEmpresa || !backCandidato) {
-        throw new Error("Elementos não encontrados");
+    const voltarEmpresa = document.getElementById("back-login-empresa");
+    const voltarCandidato = document.getElementById("back-login-candidato");
+    if (!linkEmpresa || !linkCandidato || !voltarEmpresa || !voltarCandidato) {
+        throw new Error("Elementos de navegação não encontrados");
     }
     linkEmpresa.addEventListener("click", (e) => {
         e.preventDefault();
-        controller.show("empresa");
+        alternador.exibir("empresa");
     });
     linkCandidato.addEventListener("click", (e) => {
         e.preventDefault();
-        controller.show("candidato");
+        alternador.exibir("candidato");
     });
-    backEmpresa.addEventListener("click", () => {
-        controller.show("login");
-    });
-    backCandidato.addEventListener("click", () => {
-        controller.show("login");
-    });
-    document.addEventListener("goToLogin", () => {
-        controller.show("login");
-    });
+    voltarEmpresa.addEventListener("click", () => alternador.exibir("login"));
+    voltarCandidato.addEventListener("click", () => alternador.exibir("login"));
+    document.addEventListener("goToLogin", () => alternador.exibir("login"));
 });
