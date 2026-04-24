@@ -120,6 +120,45 @@ src/main/groovy/linketinder/
 ```
 
 ---
+ 
+## ♻️ Parte 3 — Refatoração (Clean Code + MVC)
+ 
+Nessa etapa o código existente foi refatorado sem adicionar novas funcionalidades. O objetivo foi melhorar a qualidade interna aplicando os princípios de **Clean Code** e corrigindo a separação de responsabilidades do padrão **MVC**.
+ 
+### Backend (Groovy)
+ 
+**Separação MVC**
+ 
+- `AppController` foi limpo: todo `print`, `println` e `scanner` foram movidos para `MenuView`, que passou a ser responsável por tudo que toca o terminal — tanto exibir quanto ler input
+- `AppController` não acessa mais nenhum DAO diretamente. As chamadas ao `CompetenciaDAO` foram encapsuladas no novo `CompetenciaService`
+- A lógica de edição condicional de campos (`if (!campo.isEmpty()) objeto.campo = valor`) foi movida para os Services através do método `aplicarEdicao` em `CandidatoService` e `EmpresaService`
+**Clean Code**
+ 
+- Métodos e variáveis com nomes genéricos ou em inglês renomeados para português descritivo em `MatchService`, `LoginService` e `PessoaJuridica`
+- Código duplicado nos DAOs eliminado: `CandidatoDAO`, `EmpresaDAO` e `VagaDAO` ganharam métodos privados para mapear objetos, preencher statements e recuperar IDs gerados — evitando repetição entre `inserir` e `atualizar`
+- `EmpresaDAO` ganhou `buscarPorCriterio` para unificar `buscarPorId` e `buscarPorEmail`, que tinham o mesmo corpo
+- Comentários que descreviam o óbvio removidos de `PessoaJuridica`
+**Testes**
+ 
+- Os três specs (`CadastroServiceSpec`, `EmpresaServiceSpec`, `LoginServiceSpec`) acessavam campos que não existem na versão com banco de dados e não compilavam. Foram reescritos com testes isolados usando `given/when/then` do Spock sem dependência de banco
+**Arquivo novo:** `CompetenciaService.groovy` — encapsula o gerenciamento de competências de candidatos, removendo o acesso direto ao DAO do Controller
+ 
+### Frontend (TypeScript)
+ 
+**Separação MVC**
+ 
+- `MatchController` foi dividido em duas classes com responsabilidades distintas:
+  - `MatchService` — contém toda a lógica de cálculo de matches, registro de likes e consultas de dados resolvidos
+  - `SwipeController` — controla apenas o avanço de cards (curtir, recusar, detectar fim da lista), sem conhecer nada sobre matches ou regras de negócio
+- `MatchController.ts` foi removido
+**Clean Code**
+ 
+- Todos os métodos do `StorageService` traduzidos para português, com constantes de chave do `localStorage` marcadas como `readonly` e lógica de remoção de likes isolada em método privado
+- `AuthService` removeu `alert()` e `document.dispatchEvent()` — que são responsabilidades de UI — passando a retornar `boolean` para o Controller decidir o que exibir
+- Métodos de todos os Controllers (`CandidatoController`, `EmpresaController`, `AuthController`) renomeados para português descritivo
+- `AuthPagination` teve a classe interna `FormController` renomeada para `AlternadorDeFormularios` e todos os métodos traduzidos
+- `MenuPagination` atualizado para usar os novos nomes do `StorageService` com variáveis em português
+---
 
 ## 🛠️ Tecnologias Utilizadas
 
