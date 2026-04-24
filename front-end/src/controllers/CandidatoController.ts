@@ -1,12 +1,13 @@
 import { Candidato, Empresa, Vaga } from "../types.js";
 import { StorageService } from "../services/StorageService.js";
-import { MatchController } from "./MatchController.js";
+import { MatchService } from "../services/MatchService.js";
+import { SwipeController } from "../controllers/SwipeController.js";
 
 export class CandidatoController {
   private fotoBase64 = "";
   private competencias: string[] = [];
 
-  constructor(private user: Candidato) {
+  constructor(private usuario: Candidato) {
     this.init();
   }
 
@@ -14,81 +15,84 @@ export class CandidatoController {
     document.getElementById("menu-candidato")?.classList.remove("hidden");
     document.getElementById("perfil-candidato")?.classList.remove("hidden");
 
-    this.load();
-    this.events();
-    this.competenciasEvents();
-    this.initMatchVagas();
-    this.renderMatches();
+    this.carregarPerfil();
+    this.registrarEventos();
+    this.registrarEventosCompetencias();
+    this.iniciarSwipeVagas();
+    this.atualizarListaDeMatches();
   }
 
-  private input(id: string): HTMLInputElement {
+  private obterInput(id: string): HTMLInputElement {
     return document.getElementById(id) as HTMLInputElement;
   }
 
-  private textarea(id: string): HTMLTextAreaElement {
+  private obterTextarea(id: string): HTMLTextAreaElement {
     return document.getElementById(id) as HTMLTextAreaElement;
   }
 
-  private el<T extends HTMLElement>(id: string): T {
+  private obterElemento<T extends HTMLElement>(id: string): T {
     return document.getElementById(id) as T;
   }
 
-  // ================= PROFILE =================
+  // ---- PERFIL ----
 
-  private load(): void {
+  private carregarPerfil(): void {
     (
       document.getElementById("perfil-candidato-nome") as HTMLElement
-    ).textContent = this.user.nome;
+    ).textContent = this.usuario.nome;
 
-    this.input("perfil-candidato-campo-nome").value = this.user.nome;
-    this.input("perfil-candidato-campo-email").value = this.user.email;
-    this.input("perfil-candidato-campo-cpf").value = this.user.cpf;
-    this.input("perfil-candidato-campo-idade").value = this.user.idade;
-    this.input("perfil-candidato-campo-estado").value = this.user.estado;
-    this.input("perfil-candidato-campo-cep").value = this.user.cep;
-    this.textarea("perfil-candidato-campo-descricao").value =
-      this.user.descricao;
+    this.obterInput("perfil-candidato-campo-nome").value = this.usuario.nome;
+    this.obterInput("perfil-candidato-campo-email").value = this.usuario.email;
+    this.obterInput("perfil-candidato-campo-cpf").value = this.usuario.cpf;
+    this.obterInput("perfil-candidato-campo-idade").value = this.usuario.idade;
+    this.obterInput("perfil-candidato-campo-estado").value =
+      this.usuario.estado;
+    this.obterInput("perfil-candidato-campo-cep").value = this.usuario.cep;
+    this.obterTextarea("perfil-candidato-campo-descricao").value =
+      this.usuario.descricao;
 
-    this.competencias = [...this.user.competencias];
-    this.renderCompetencias();
+    this.competencias = [...this.usuario.competencias];
+    this.renderizarCompetencias();
 
-    const fotoEl = document.getElementById(
+    const avatarEl = document.getElementById(
       "perfil-candidato-avatar",
     ) as HTMLDivElement;
-    if (this.user.foto) {
-      this.fotoBase64 = this.user.foto;
-      fotoEl.style.backgroundImage = `url(${this.user.foto})`;
-      fotoEl.style.backgroundSize = "cover";
-      fotoEl.style.backgroundPosition = "center";
-      fotoEl.textContent = "";
+    if (this.usuario.foto) {
+      this.fotoBase64 = this.usuario.foto;
+      avatarEl.style.backgroundImage = `url(${this.usuario.foto})`;
+      avatarEl.style.backgroundSize = "cover";
+      avatarEl.style.backgroundPosition = "center";
+      avatarEl.textContent = "";
     } else {
-      const iniciais = this.user.nome
+      avatarEl.textContent = this.usuario.nome
         .split(" ")
         .map((n: string) => n[0])
         .slice(0, 2)
         .join("")
         .toUpperCase();
-      fotoEl.textContent = iniciais;
     }
   }
 
-  private events(): void {
+  private registrarEventos(): void {
     document.getElementById("btn-logout")?.addEventListener("click", () => {
-      StorageService.clearCurrentUser();
+      StorageService.removerUsuarioAtual();
       window.location.href = "auth.html";
     });
 
     document
       .getElementById("perfil-candidato-btn-salvar")
-      ?.addEventListener("click", () => this.save());
+      ?.addEventListener("click", () => this.salvarPerfil());
 
-    const foto = document.getElementById("perfil-candidato-avatar");
+    document
+      .getElementById("perfil-candidato-btn-excluir")
+      ?.addEventListener("click", () => this.excluirConta());
+
+    const avatarEl = document.getElementById("perfil-candidato-avatar");
     const inputFoto = document.getElementById(
       "perfil-candidato-avatar-input",
     ) as HTMLInputElement;
-
-    foto?.addEventListener("click", () => inputFoto.click());
-    inputFoto?.addEventListener("change", (e) => this.handleFoto(e));
+    avatarEl?.addEventListener("click", () => inputFoto.click());
+    inputFoto?.addEventListener("change", (e) => this.processarFoto(e));
 
     document
       .getElementById("modal-vaga-btn-fechar")
@@ -99,139 +103,118 @@ export class CandidatoController {
           ?.classList.add("hidden");
       });
 
-    document
-      .getElementById("perfil-candidato-btn-excluir")
-      ?.addEventListener("click", () => this.deleteAccount());
-
-    this.togglePassword(
+    this.configurarAlternarSenha(
       "perfil-candidato-campo-senha-atual",
       "perfil-candidato-toggle-senha-atual",
     );
-    this.togglePassword(
+    this.configurarAlternarSenha(
       "perfil-candidato-campo-nova-senha",
       "perfil-candidato-toggle-nova-senha",
     );
   }
 
-  private togglePassword(inputId: string, buttonId: string): void {
+  private configurarAlternarSenha(inputId: string, botaoId: string): void {
     const input = document.getElementById(inputId) as HTMLInputElement;
-    const button = document.getElementById(buttonId);
-    if (!input || !button) return;
-    button.addEventListener("click", () => {
+    const botao = document.getElementById(botaoId);
+    if (!input || !botao) return;
+    botao.addEventListener("click", () => {
       input.type = input.type === "password" ? "text" : "password";
     });
   }
 
-  private handleFoto(e: Event): void {
-    const input = e.target as HTMLInputElement;
-    const file = input.files?.[0];
-
-    if (!file) return;
+  private processarFoto(evento: Event): void {
+    const input = evento.target as HTMLInputElement;
+    const arquivo = input.files?.[0];
+    if (!arquivo) return;
 
     const reader = new FileReader();
-
     reader.onload = () => {
       this.fotoBase64 = reader.result as string;
-
-      const foto = document.getElementById(
+      const avatarEl = document.getElementById(
         "perfil-candidato-avatar",
       ) as HTMLDivElement;
-      foto.style.backgroundImage = `url(${this.fotoBase64})`;
-      foto.style.backgroundSize = "cover";
-      foto.style.backgroundPosition = "center";
-      foto.textContent = "";
+      avatarEl.style.backgroundImage = `url(${this.fotoBase64})`;
+      avatarEl.style.backgroundSize = "cover";
+      avatarEl.style.backgroundPosition = "center";
+      avatarEl.textContent = "";
     };
-
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(arquivo);
   }
 
-  private save(): void {
-    const current = StorageService.getCurrentUser() as Candidato;
-
-    const senhaAtualDigitada = this.input(
+  private salvarPerfil(): void {
+    const senhaAtual = this.obterInput(
       "perfil-candidato-campo-senha-atual",
     ).value.trim();
-    const novaSenha = this.input(
+    const novaSenha = this.obterInput(
       "perfil-candidato-campo-nova-senha",
     ).value.trim();
 
-    if (senhaAtualDigitada && senhaAtualDigitada !== current.senha) {
+    if (senhaAtual && senhaAtual !== this.usuario.senha) {
       alert("Senha atual incorreta.");
       return;
     }
-
     if (novaSenha && novaSenha.length < 6) {
       alert("A nova senha deve ter pelo menos 6 caracteres.");
       return;
     }
 
-    const updated: Candidato = {
-      ...current,
-      nome: this.input("perfil-candidato-campo-nome").value,
-      email: this.input("perfil-candidato-campo-email").value,
-      cpf: this.input("perfil-candidato-campo-cpf").value,
-      idade: this.input("perfil-candidato-campo-idade").value,
-      estado: this.input("perfil-candidato-campo-estado").value,
-      cep: this.input("perfil-candidato-campo-cep").value,
-      descricao: this.textarea("perfil-candidato-campo-descricao").value,
-      foto: this.fotoBase64 || current.foto,
+    const atualizado: Candidato = {
+      ...this.usuario,
+      nome: this.obterInput("perfil-candidato-campo-nome").value,
+      email: this.obterInput("perfil-candidato-campo-email").value,
+      cpf: this.obterInput("perfil-candidato-campo-cpf").value,
+      idade: this.obterInput("perfil-candidato-campo-idade").value,
+      estado: this.obterInput("perfil-candidato-campo-estado").value,
+      cep: this.obterInput("perfil-candidato-campo-cep").value,
+      descricao: this.obterTextarea("perfil-candidato-campo-descricao").value,
+      foto: this.fotoBase64 || this.usuario.foto,
       competencias: this.competencias,
-      senha: novaSenha || current.senha,
+      senha: novaSenha || this.usuario.senha,
     };
 
-    StorageService.updateUser(updated);
-    this.user = updated;
-
+    StorageService.atualizarUsuario(atualizado);
+    this.usuario = atualizado;
     (
       document.getElementById("perfil-candidato-nome") as HTMLElement
-    ).textContent = updated.nome;
-
-    this.input("perfil-candidato-campo-senha-atual").value = "";
-    this.input("perfil-candidato-campo-nova-senha").value = "";
-
+    ).textContent = atualizado.nome;
+    this.obterInput("perfil-candidato-campo-senha-atual").value = "";
+    this.obterInput("perfil-candidato-campo-nova-senha").value = "";
     alert("Salvo!");
   }
 
-  private deleteAccount(): void {
+  private excluirConta(): void {
     if (!confirm("Tem certeza que deseja excluir sua conta?")) return;
-
-    StorageService.deleteUser(this.user.id);
+    StorageService.excluirUsuario(this.usuario.id);
     alert("Conta excluída com sucesso.");
     window.location.href = "auth.html";
   }
 
-  // ================= COMPETENCIAS =================
+  // ---- COMPETÊNCIAS ----
 
-  private renderCompetencias(): void {
+  private renderizarCompetencias(): void {
     const lista = document.getElementById(
       "perfil-candidato-competencias-lista",
     );
     const template = document.getElementById(
       "perfil-candidato-competencia-template",
     ) as HTMLDivElement;
-
     if (!lista || !template) return;
 
     lista.innerHTML = "";
-
-    this.competencias.forEach((c, index) => {
+    this.competencias.forEach((competencia, indice) => {
       const item = template.cloneNode(true) as HTMLDivElement;
       item.classList.remove("hidden");
-
-      item.querySelector(".competencia__texto")!.textContent = c;
-
+      item.querySelector(".competencia__texto")!.textContent = competencia;
       item.addEventListener("click", () => {
         if (!confirm("Remover competência?")) return;
-
-        this.competencias.splice(index, 1);
-        this.renderCompetencias();
+        this.competencias.splice(indice, 1);
+        this.renderizarCompetencias();
       });
-
       lista.appendChild(item);
     });
   }
 
-  private competenciasEvents(): void {
+  private registrarEventosCompetencias(): void {
     const btn = document.getElementById("perfil-candidato-btn-add-competencia");
     const popup = document.getElementById("perfil-candidato-popup-competencia");
     const input = document.getElementById(
@@ -241,7 +224,6 @@ export class CandidatoController {
       "perfil-candidato-popup-confirmar",
     ) as HTMLButtonElement;
     const cancelar = document.getElementById("perfil-candidato-popup-cancelar");
-
     if (!btn || !popup || !input || !confirmar || !cancelar) return;
 
     const regex = /^[A-Za-zÀ-ÿ0-9.+#-]{2,30}(?:\s[A-Za-zÀ-ÿ0-9.+#-]{2,30})*$/;
@@ -254,20 +236,16 @@ export class CandidatoController {
 
     confirmar.onclick = () => {
       const valor = input.value.trim();
-
       if (!valor) {
         alert("Digite uma competência");
         return;
       }
-
       if (!regex.test(valor)) {
         alert("Digite uma competência válida (ex: Java, React, Node.js)");
         return;
       }
-
       this.competencias.push(valor);
-      this.renderCompetencias();
-
+      this.renderizarCompetencias();
       popup.classList.add("hidden");
       input.value = "";
     };
@@ -277,31 +255,20 @@ export class CandidatoController {
       input.value = "";
     };
   }
-  // ================= MATCH =================
 
-  private initMatchVagas(): void {
-    const likes = StorageService.getLikes();
+  // ---- SWIPE VAGAS ----
 
-    const vagas = StorageService.getAllVagas().filter(
-      (vaga) =>
-        !likes.some(
-          (like) =>
-            "vagaId" in like &&
-            like.candidatoId === this.user.id &&
-            like.vagaId === vaga.id,
-        ),
+  private iniciarSwipeVagas(): void {
+    const vagasNaoVistas = MatchService.obterVagasNaoVistasPeloCandidato(
+      this.usuario.id,
     );
 
-    new MatchController<Vaga>(
-      vagas,
-      (vaga) => this.renderCardVaga(vaga),
+    new SwipeController<Vaga>(
+      vagasNaoVistas,
+      (vaga) => this.exibirCardVaga(vaga),
       (vaga) => {
-        StorageService.saveLike({
-          candidatoId: this.user.id,
-          vagaId: vaga.id,
-        });
-
-        this.renderMatches();
+        MatchService.registrarLikeCandidatoVaga(this.usuario.id, vaga.id);
+        this.atualizarListaDeMatches();
       },
       () => {
         document.getElementById("match-swipe-card")?.classList.add("hidden");
@@ -312,10 +279,8 @@ export class CandidatoController {
     );
   }
 
-  private renderCardVaga(vaga: Vaga): void {
+  private exibirCardVaga(vaga: Vaga): void {
     document.getElementById("match-swipe-card")?.classList.remove("hidden");
-
-    // mostra vaga e esconde candidato
     document
       .getElementById("match-swipe-dados-vaga")
       ?.classList.remove("hidden");
@@ -323,33 +288,27 @@ export class CandidatoController {
       .getElementById("match-swipe-dados-candidato")
       ?.classList.add("hidden");
 
-    // tipo + título
-    const tipoEl = document.getElementById("match-swipe-tipo") as HTMLElement;
-    if (tipoEl) tipoEl.textContent = "Vaga";
+    (document.getElementById("match-swipe-tipo") as HTMLElement).textContent =
+      "Vaga";
     (document.getElementById("match-swipe-titulo") as HTMLElement).textContent =
       vaga.titulo;
 
-    // dados
     (
       document.getElementById(
         "match-swipe-vaga-descricao",
       ) as HTMLTextAreaElement
     ).value = vaga.descricao || "";
-
     (
       document.getElementById("match-swipe-vaga-horario") as HTMLInputElement
     ).value = vaga.horario || "";
-
     (
       document.getElementById(
         "match-swipe-vaga-localizacao",
       ) as HTMLInputElement
     ).value = vaga.localizacao || "";
-
     (
       document.getElementById("match-swipe-vaga-salario") as HTMLInputElement
     ).value = vaga.remuneracao || "";
-
     (
       document.getElementById(
         "match-swipe-vaga-requisitos",
@@ -357,72 +316,67 @@ export class CandidatoController {
     ).value = vaga.requisitos || "";
   }
 
-  // ================= MATCH LIST =================
+  // ---- MATCHES ----
 
-  private renderMatches(): void {
+  private atualizarListaDeMatches(): void {
     const lista = document.getElementById("matches-lista");
     const template = lista?.querySelector(".matches__item") as HTMLElement;
-
     if (!lista || !template) return;
 
     lista.innerHTML = "";
     lista.appendChild(template);
     template.classList.add("hidden");
 
-    const matches = MatchController.getMatches().filter(
-      (m) => m.candidatoId === this.user.id,
+    MatchService.obterMatchesCompletosDoCandidato(this.usuario.id).forEach(
+      ({ vaga, empresa }) => {
+        const item = template.cloneNode(true) as HTMLElement;
+        item.classList.remove("hidden");
+        item.querySelector(".matches__item-titulo")!.textContent = vaga.titulo;
+        item.addEventListener("click", () =>
+          this.abrirDetalhesVaga(vaga, empresa),
+        );
+        lista.appendChild(item);
+      },
     );
-
-    matches.forEach((match) => {
-      const vaga = StorageService.getAllVagas().find(
-        (v) => v.id === match.vagaId,
-      );
-
-      if (!vaga) return;
-
-      const item = template.cloneNode(true) as HTMLElement;
-      item.classList.remove("hidden");
-
-      item.querySelector(".matches__item-titulo")!.textContent = vaga.titulo;
-
-      item.addEventListener("click", () => this.openVagaView(vaga));
-
-      lista.appendChild(item);
-    });
   }
 
-  private openVagaView(vaga: Vaga): void {
-    this.el("modal-vaga").classList.remove("hidden");
-    this.el("modal-vaga-dados-empresa").classList.remove("hidden");
+  private abrirDetalhesVaga(vaga: Vaga, empresa: Empresa): void {
+    this.obterElemento("modal-vaga").classList.remove("hidden");
+    this.obterElemento("modal-vaga-dados-empresa").classList.remove("hidden");
 
-    (this.el("modal-vaga-titulo") as HTMLElement).textContent = vaga.titulo;
-    this.el<HTMLTextAreaElement>("modal-vaga-campo-descricao").value =
-      vaga.descricao || "";
-    this.el<HTMLInputElement>("modal-vaga-campo-horario").value =
+    (document.getElementById("modal-vaga-titulo") as HTMLElement).textContent =
+      vaga.titulo;
+
+    this.obterElemento<HTMLTextAreaElement>(
+      "modal-vaga-campo-descricao",
+    ).value = vaga.descricao || "";
+    this.obterElemento<HTMLInputElement>("modal-vaga-campo-horario").value =
       vaga.horario || "";
-    this.el<HTMLInputElement>("modal-vaga-campo-localizacao").value =
+    this.obterElemento<HTMLInputElement>("modal-vaga-campo-localizacao").value =
       vaga.localizacao || "";
-    this.el<HTMLInputElement>("modal-vaga-campo-salario").value =
+    this.obterElemento<HTMLInputElement>("modal-vaga-campo-salario").value =
       vaga.remuneracao || "";
-    this.el<HTMLTextAreaElement>("modal-vaga-campo-requisitos").value =
-      vaga.requisitos || "";
-    this.el<HTMLTextAreaElement>("modal-vaga-campo-competencias").value =
-      vaga.competencias.join(", ");
+    this.obterElemento<HTMLTextAreaElement>(
+      "modal-vaga-campo-requisitos",
+    ).value = vaga.requisitos || "";
+    this.obterElemento<HTMLTextAreaElement>(
+      "modal-vaga-campo-competencias",
+    ).value = vaga.competencias.join(", ");
 
-    const empresa = StorageService.getUsers().find(
-      (u): u is Empresa => u.tipo === "empresa" && u.id === vaga.empresaId,
-    );
-
-    if (!empresa) return;
-
-    this.el<HTMLInputElement>("modal-vaga-empresa-nome").value = empresa.nome;
-    this.el<HTMLInputElement>("modal-vaga-empresa-email").value = empresa.email;
-    this.el<HTMLInputElement>("modal-vaga-empresa-cnpj").value = empresa.cnpj;
-    this.el<HTMLTextAreaElement>("modal-vaga-empresa-descricao").value =
-      empresa.descricao;
-    this.el<HTMLInputElement>("modal-vaga-empresa-pais").value = empresa.pais;
-    this.el<HTMLInputElement>("modal-vaga-empresa-estado").value =
+    this.obterElemento<HTMLInputElement>("modal-vaga-empresa-nome").value =
+      empresa.nome;
+    this.obterElemento<HTMLInputElement>("modal-vaga-empresa-email").value =
+      empresa.email;
+    this.obterElemento<HTMLInputElement>("modal-vaga-empresa-cnpj").value =
+      empresa.cnpj;
+    this.obterElemento<HTMLTextAreaElement>(
+      "modal-vaga-empresa-descricao",
+    ).value = empresa.descricao;
+    this.obterElemento<HTMLInputElement>("modal-vaga-empresa-pais").value =
+      empresa.pais;
+    this.obterElemento<HTMLInputElement>("modal-vaga-empresa-estado").value =
       empresa.estado;
-    this.el<HTMLInputElement>("modal-vaga-empresa-cep").value = empresa.cep;
+    this.obterElemento<HTMLInputElement>("modal-vaga-empresa-cep").value =
+      empresa.cep;
   }
 }
