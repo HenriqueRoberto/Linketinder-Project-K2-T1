@@ -1,142 +1,120 @@
 import { Empresa, Like, User, Vaga } from "../types.js";
 
 export class StorageService {
-  private static usersKey = "users";
-  private static currentUserKey = "currentUser";
-  private static likesKey = "likes";
+  private static readonly CHAVE_USUARIOS = "users";
+  private static readonly CHAVE_USUARIO_ATUAL = "currentUser";
+  private static readonly CHAVE_LIKES = "likes";
 
-  static getUsers(): User[] {
-    return JSON.parse(localStorage.getItem(this.usersKey) || "[]");
+  static obterUsuarios(): User[] {
+    return JSON.parse(localStorage.getItem(this.CHAVE_USUARIOS) || "[]");
   }
 
-  static saveUsers(users: User[]): void {
-    localStorage.setItem(this.usersKey, JSON.stringify(users));
+  static salvarUsuarios(usuarios: User[]): void {
+    localStorage.setItem(this.CHAVE_USUARIOS, JSON.stringify(usuarios));
   }
 
-  static getCurrentUser(): User {
-    const data = localStorage.getItem(this.currentUserKey);
-
-    if (!data) {
+  static obterUsuarioAtual(): User {
+    const dados = localStorage.getItem(this.CHAVE_USUARIO_ATUAL);
+    if (!dados) {
       window.location.href = "auth.html";
-      throw new Error("Não logado");
+      throw new Error("Usuário não autenticado");
     }
-
-    return JSON.parse(data);
+    return JSON.parse(dados);
   }
 
-  static saveCurrentUser(user: User): void {
-    localStorage.setItem(this.currentUserKey, JSON.stringify(user));
+  static salvarUsuarioAtual(usuario: User): void {
+    localStorage.setItem(this.CHAVE_USUARIO_ATUAL, JSON.stringify(usuario));
   }
 
-  static clearCurrentUser(): void {
-    localStorage.removeItem(this.currentUserKey);
+  static removerUsuarioAtual(): void {
+    localStorage.removeItem(this.CHAVE_USUARIO_ATUAL);
   }
 
-  static updateUser(user: User): void {
-    const users = this.getUsers();
-    const index = users.findIndex((u) => u.id === user.id);
-
-    if (index === -1) return;
-
-    users[index] = user;
-
-    this.saveUsers(users);
-    this.saveCurrentUser(user);
+  static atualizarUsuario(usuario: User): void {
+    const usuarios = this.obterUsuarios();
+    const indice = usuarios.findIndex((u) => u.id === usuario.id);
+    if (indice === -1) return;
+    usuarios[indice] = usuario;
+    this.salvarUsuarios(usuarios);
+    this.salvarUsuarioAtual(usuario);
   }
 
-  static getAllVagas(): Vaga[] {
-    return this.getUsers()
-      .filter((u): u is Empresa => u.tipo === "empresa")
-      .reduce((acc: Vaga[], empresa) => acc.concat(empresa.vagas || []), []);
-  }
-
-  static getEmpresaByVaga(vagaId: string): Empresa | null {
-    const empresas = this.getUsers().filter(
-      (u): u is Empresa => u.tipo === "empresa",
+  static excluirUsuario(usuarioId: string): void {
+    const usuariosFiltrados = this.obterUsuarios().filter(
+      (u) => u.id !== usuarioId,
     );
+    this.salvarUsuarios(usuariosFiltrados);
+    this.removerLikesDoUsuario(usuarioId);
 
-    for (const empresa of empresas) {
-      const vaga = empresa.vagas?.find((v) => v.id === vagaId);
-      if (vaga) return empresa;
+    const atual = localStorage.getItem(this.CHAVE_USUARIO_ATUAL);
+    if (atual && JSON.parse(atual).id === usuarioId) {
+      this.removerUsuarioAtual();
     }
+  }
 
-    return null;
+  static obterTodasVagas(): Vaga[] {
+    return this.obterUsuarios()
+      .filter((u): u is Empresa => u.tipo === "empresa")
+      .reduce(
+        (acc: Vaga[], empresa: Empresa) => acc.concat(empresa.vagas || []),
+        [],
+      );
+  }
+
+  static obterEmpresaPorVaga(vagaId: string): Empresa | null {
+    return (
+      this.obterUsuarios()
+        .filter((u): u is Empresa => u.tipo === "empresa")
+        .find((empresa: Empresa) =>
+          empresa.vagas?.some((v) => v.id === vagaId),
+        ) ?? null
+    );
   }
 
   static getLikes(): Like[] {
-    return JSON.parse(localStorage.getItem(this.likesKey) || "[]");
+    return JSON.parse(localStorage.getItem(this.CHAVE_LIKES) || "[]");
   }
 
-  static saveLike(like: Like): void {
+  static salvarLike(like: Like): void {
     const likes = this.getLikes();
-
-    const exists = likes.some(
-      (item) => JSON.stringify(item) === JSON.stringify(like),
+    const jaExiste = likes.some(
+      (l) => JSON.stringify(l) === JSON.stringify(like),
     );
-
-    if (exists) return;
-
+    if (jaExiste) return;
     likes.push(like);
-    localStorage.setItem(this.likesKey, JSON.stringify(likes));
+    localStorage.setItem(this.CHAVE_LIKES, JSON.stringify(likes));
   }
 
-  static saveLikes(likes: Like[]): void {
-    localStorage.setItem(this.likesKey, JSON.stringify(likes));
-  }
-
-  static deleteVaga(vagaId: string, empresaId: string): void {
-    const users = this.getUsers().map((user) => {
-      if (user.tipo !== "empresa" || user.id !== empresaId) return user;
-
+  static excluirVaga(vagaId: string, empresaId: string): void {
+    const usuarios = this.obterUsuarios().map((usuario) => {
+      if (usuario.tipo !== "empresa" || usuario.id !== empresaId)
+        return usuario;
       return {
-        ...user,
-        vagas: (user.vagas || []).filter((vaga) => vaga.id !== vagaId),
+        ...usuario,
+        vagas: (usuario.vagas || []).filter((v) => v.id !== vagaId),
       };
     });
+    this.salvarUsuarios(usuarios);
 
-    this.saveUsers(users);
-
-    const current = this.getCurrentUser();
-    if (current.tipo === "empresa" && current.id === empresaId) {
-      const updated = users.find(
+    const atual = this.obterUsuarioAtual();
+    if (atual.tipo === "empresa" && atual.id === empresaId) {
+      const empresaAtualizada = usuarios.find(
         (u): u is Empresa => u.tipo === "empresa" && u.id === empresaId,
       );
-      if (updated) this.saveCurrentUser(updated);
+      if (empresaAtualizada) this.salvarUsuarioAtual(empresaAtualizada);
     }
 
-    const likes = this.getLikes().filter((like) => {
-      if ("vagaId" in like) {
-        return like.vagaId !== vagaId;
-      }
-
-      return true;
-    });
-
-    this.saveLikes(likes);
+    const likesSemVaga = this.getLikes().filter(
+      (like) => !("vagaId" in like) || like.vagaId !== vagaId,
+    );
+    localStorage.setItem(this.CHAVE_LIKES, JSON.stringify(likesSemVaga));
   }
 
-  static deleteUser(userId: string): void {
-    const users = this.getUsers().filter((user) => user.id !== userId);
-    this.saveUsers(users);
-
+  private static removerLikesDoUsuario(usuarioId: string): void {
     const likes = this.getLikes().filter((like) => {
-      if ("vagaId" in like) {
-        const vaga = this.getAllVagas().find((v) => v.id === like.vagaId);
-
-        return like.candidatoId !== userId && vaga;
-      }
-
-      return like.candidatoId !== userId && like.empresaId !== userId;
+      if ("vagaId" in like) return like.candidatoId !== usuarioId;
+      return like.candidatoId !== usuarioId && like.empresaId !== usuarioId;
     });
-
-    this.saveLikes(likes);
-
-    const current = localStorage.getItem(this.currentUserKey);
-    if (current) {
-      const parsed = JSON.parse(current) as User;
-      if (parsed.id === userId) {
-        this.clearCurrentUser();
-      }
-    }
+    localStorage.setItem(this.CHAVE_LIKES, JSON.stringify(likes));
   }
 }
