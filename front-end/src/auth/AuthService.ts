@@ -2,39 +2,31 @@ import { User } from "../types.js";
 import { StorageService } from "../services/StorageService.js";
 
 export class AuthService {
-  register(user: User): void {
-    const users = StorageService.getUsers();
+  registrar(usuario: User): boolean {
+    const emailJaCadastrado = StorageService.obterUsuarios().some(
+      (u) => u.email === usuario.email,
+    );
 
-    const exists = users.some((u) => u.email === user.email);
+    if (emailJaCadastrado) return false;
 
-    if (exists) {
-      alert("Email já cadastrado");
-      return;
-    }
-
-    users.push(user);
-    StorageService.saveUsers(users);
-
-    alert("Cadastro realizado!");
-    document.dispatchEvent(new CustomEvent("goToLogin"));
+    const usuarios = StorageService.obterUsuarios();
+    usuarios.push(usuario);
+    StorageService.salvarUsuarios(usuarios);
+    return true;
   }
 
-  login(email: string, senha: string): void {
-    const users = StorageService.getUsers();
+  login(email: string, senha: string): boolean {
+    const usuario = StorageService.obterUsuarios().find(
+      (u) => u.email === email && u.senha === senha,
+    );
 
-    const user = users.find((u) => u.email === email && u.senha === senha);
+    if (!usuario) return false;
 
-    if (!user) {
-      alert("Login inválido");
-      return;
-    }
-
-    StorageService.saveCurrentUser(user);
-    window.location.href = "app.html";
+    StorageService.salvarUsuarioAtual(usuario);
+    return true;
   }
 
   logout(): void {
-    StorageService.clearCurrentUser();
-    window.location.href = "auth.html";
+    StorageService.removerUsuarioAtual();
   }
 }
